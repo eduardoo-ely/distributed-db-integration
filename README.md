@@ -271,9 +271,9 @@ MIT License
 # 👤 Autores
 
 **Eduardo de Paula**
-**Inaye Karolaine**
-**Mateus Conte**
 
-```
+**Inaye Karolaine**
+
+**Mateus Conte**
 Quer algum desses?
 ```
