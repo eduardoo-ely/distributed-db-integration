@@ -1,7 +1,3 @@
----
-
-# 📄 **README.md — Polyglot Data Architecture (PostgreSQL + MongoDB + Neo4j)**
-
 ````markdown
 # 🧩 Polyglot Data Architecture — PostgreSQL + MongoDB + Neo4j
 
