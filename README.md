@@ -275,5 +275,3 @@ MIT License
 **Inaye Karolaine**
 
 **Mateus Conte**
-Quer algum desses?
-```
