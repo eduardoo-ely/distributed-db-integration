@@ -1,4 +1,3 @@
-````
 ## 🧩 Polyglot Data Architecture — PostgreSQL + MongoDB + Neo4j
 
 Projeto profissional que implementa uma arquitetura de persistência poliglota, integrando **PostgreSQL**, **MongoDB** e **Neo4j** em uma aplicação Python.  
