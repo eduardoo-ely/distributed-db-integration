@@ -1,0 +1,17 @@
+/home/eduardo/projetos/bancos-java/src/main/java/com/academia/bancos/model/AggregatedUser.java
+/home/eduardo/projetos/bancos-java/src/main/java/com/academia/bancos/repository/PostgresUserRepository.java
+/home/eduardo/projetos/bancos-java/src/main/java/com/academia/bancos/model/UserCredential.java
+/home/eduardo/projetos/bancos-java/src/main/java/com/academia/bancos/repository/MongoUserRepository.java
+/home/eduardo/projetos/bancos-java/src/main/java/com/academia/bancos/seed/DataSeeder.java
+/home/eduardo/projetos/bancos-java/src/main/java/com/academia/bancos/controller/UserController.java
+/home/eduardo/projetos/bancos-java/src/main/java/com/academia/bancos/model/UserGraph.java
+/home/eduardo/projetos/bancos-java/src/main/java/com/academia/bancos/config/Neo4jConfig.java
+/home/eduardo/projetos/bancos-java/src/main/java/com/academia/bancos/service/RedisUserService.java
+/home/eduardo/projetos/bancos-java/src/main/java/com/academia/bancos/service/UserService.java
+/home/eduardo/projetos/bancos-java/src/main/java/com/academia/bancos/model/UserProfile.java
+/home/eduardo/projetos/bancos-java/src/main/java/com/academia/bancos/Main.java
+/home/eduardo/projetos/bancos-java/src/main/java/com/academia/bancos/config/PostgresConfig.java
+/home/eduardo/projetos/bancos-java/src/main/java/com/academia/bancos/repository/Neo4jUserRepository.java
+/home/eduardo/projetos/bancos-java/src/main/java/com/academia/bancos/model/Usuario.java
+/home/eduardo/projetos/bancos-java/src/main/java/com/academia/bancos/config/RedisConfig.java
+/home/eduardo/projetos/bancos-java/src/main/java/com/academia/bancos/config/MongoConfig.java
