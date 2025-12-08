@@ -1,76 +1,30 @@
 package com.academia.bancos.service;
 
-import com.academia.bancos.config.RedisConfig;
-import redis.clients.jedis.Jedis;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
 
-/**
- * Service para operações de cache com Redis
- * Gerencia contadores de login
- */
-
+@Service
+@RequiredArgsConstructor
 public class RedisUserService {
 
-    private final RedisConfig config;
-    private static final String LOGIN_PREFIX = "user:login:";
+    private final StringRedisTemplate redisTemplate;
 
-    public RedisUserService() {
-        this.config = RedisConfig.getInstance();
-        System.out.println("✅ RedisUserService inicializado");
+    public void initCounter(String userId) {
+        redisTemplate.opsForValue().set("login_count:" + userId, "0");
     }
 
-    public void initUser(String userId) {
-        try (Jedis jedis = config.getConnection()) {
-            String key = LOGIN_PREFIX + userId;
-            jedis.set(key, "0");
-        }
+    public Integer incrementLogin(String userId) {
+        Long val = redisTemplate.opsForValue().increment("login_count:" + userId);
+        return val != null ? val.intValue() : 0;
     }
 
-    public void incrementLogin(String userId) {
-        try (Jedis jedis = config.getConnection()) {
-            String key = LOGIN_PREFIX + userId;
-            jedis.incr(key);
-        }
-    }
-
-    public int getLoginCount(String userId) {
-        try (Jedis jedis = config.getConnection()) {
-            String key = LOGIN_PREFIX + userId;
-            String value = jedis.get(key);
-            return value != null ? Integer.parseInt(value) : 0;
-        }
-    }
-
-    public void setLoginCount(String userId, int count) {
-        try (Jedis jedis = config.getConnection()) {
-            String key = LOGIN_PREFIX + userId;
-            jedis.set(key, String.valueOf(count));
-        }
+    public Integer getLoginCount(String userId) {
+        String val = redisTemplate.opsForValue().get("login_count:" + userId);
+        return val != null ? Integer.parseInt(val) : 0;
     }
 
     public void deleteUser(String userId) {
-        try (Jedis jedis = config.getConnection()) {
-            String key = LOGIN_PREFIX + userId;
-            jedis.del(key);
-        }
-    }
-
-    public boolean exists(String userId) {
-        try (Jedis jedis = config.getConnection()) {
-            String key = LOGIN_PREFIX + userId;
-            return jedis.exists(key);
-        }
-    }
-
-    public void resetLoginCount(String userId) {
-        try (Jedis jedis = config.getConnection()) {
-            String key = LOGIN_PREFIX + userId;
-            jedis.set(key, "0");
-        }
-    }
-
-    public void deleteAllUsers() {
-        try (Jedis jedis = config.getConnection()) {
-            jedis.keys(LOGIN_PREFIX + "*").forEach(jedis::del);
-        }
+        redisTemplate.delete("login_count:" + userId);
     }
 }
