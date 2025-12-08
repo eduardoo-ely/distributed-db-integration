@@ -1,0 +1,49 @@
+# ============================
+# IntelliJ IDEA / JetBrains
+# ============================
+.idea/
+*.iml
+out/
+
+# ============================
+# Maven
+# ============================
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# ============================
+# Logs
+# ============================
+*.log
+
+# ============================
+# OS files
+# ============================
+.DS_Store
+Thumbs.db
+
+# ============================
+# Python
+# ============================
+venv/
+__pycache__/
+*.pyc
+
+# ============================
+# Environment files
+# ============================
+.env
+*.env
+
+# ============================
+# Dataset baixado localmente
+# ============================
+netflix_userbase.json
+relationships.json
+download_netflix_dataset.py
+*.csv
+
+# ============================
+# Docker
+# ============================
+# (geralmente nada preci
