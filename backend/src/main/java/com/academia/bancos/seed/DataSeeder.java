@@ -4,6 +4,8 @@ import com.academia.bancos.model.*;
 import com.academia.bancos.service.UserService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileReader;
@@ -13,29 +15,26 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Classe para popular os bancos de dados com dados do dataset
- * Lê os arquivos JSON gerados pelo script Python
+ * Componente para popular os bancos de dados.
+ * Agora gerenciado pelo Spring Boot.
  */
-
+@Component
+@RequiredArgsConstructor
 public class DataSeeder {
 
     private final UserService userService;
-    private final Gson gson;
 
-    public DataSeeder() {
-        this.userService = new UserService();
-        this.gson = new Gson();
-    }
+    private final Gson gson = new Gson();
 
     /**
      * Executa o seed completo
      */
     public void seedAll() {
         System.out.println("=".repeat(60));
-        System.out.println("🌱 INICIANDO SEED DE DADOS");
+        System.out.println("🌱 INICIANDO SEED DE DADOS (SPRING BOOT)");
         System.out.println("=".repeat(60));
 
-        // Verificar se arquivos existem
+        // Verificar se arquivos existem na raiz do projeto
         if (!checkFiles()) {
             return;
         }
@@ -58,20 +57,18 @@ public class DataSeeder {
      * Verifica se os arquivos JSON existem
      */
     private boolean checkFiles() {
+        // Assume que os arquivos estão na raiz do projeto (onde o Python rodou)
         File usersFile = new File("netflix_userbase.json");
         File relationsFile = new File("relationships.json");
 
         if (!usersFile.exists()) {
             System.err.println("\n❌ Arquivo não encontrado: netflix_userbase.json");
-            System.err.println("📝 Execute o script Python primeiro:");
-            System.err.println("   python3 download_netflix_dataset.py");
+            System.err.println("📝 Execute o script Python na raiz do projeto primeiro!");
             return false;
         }
 
         if (!relationsFile.exists()) {
             System.err.println("\n❌ Arquivo não encontrado: relationships.json");
-            System.err.println("📝 Execute o script Python primeiro:");
-            System.err.println("   python3 download_netflix_dataset.py");
             return false;
         }
 
@@ -94,7 +91,6 @@ public class DataSeeder {
 
         System.out.println("✅ " + usersData.size() + " usuários carregados");
         System.out.println("\n🔄 Inserindo usuários nos bancos de dados...");
-        System.out.println("   (Isso pode levar alguns minutos...)");
 
         int successCount = 0;
         int errorCount = 0;
@@ -103,31 +99,32 @@ public class DataSeeder {
             try {
                 Map<String, Object> userData = usersData.get(i);
                 AggregatedUser user = parseUser(userData);
+
+                // Agora funciona porque a variável lá em cima é 'userService'
                 userService.createUser(user);
+
                 successCount++;
 
-                // Mostrar progresso a cada 100 usuários
                 if (successCount % 100 == 0) {
                     System.out.println("   ⏳ " + successCount + "/" + usersData.size() + " usuários inseridos...");
                 }
 
             } catch (Exception e) {
                 errorCount++;
-                System.err.println("⚠️ Erro ao inserir usuário " + i + ": " + e.getMessage());
+                // Log de erro simplificado para não poluir
+                if (errorCount <= 5) System.err.println("⚠️ Erro (exemplo): " + e.getMessage());
             }
         }
 
         System.out.println("\n✅ Usuários inseridos: " + successCount);
-        if (errorCount > 0) {
-            System.out.println("⚠️ Erros: " + errorCount);
-        }
+        if (errorCount > 0) System.out.println("⚠️ Total de erros: " + errorCount);
     }
 
     /**
      * Cria relacionamentos entre usuários no Neo4j
      */
     private void seedRelationships() throws IOException {
-        System.out.println("\n📥 Carregando relacionamentos do arquivo JSON...");
+        System.out.println("\n📥 Carregando relacionamentos...");
 
         Type relationshipListType = new TypeToken<List<Map<String, String>>>(){}.getType();
         List<Map<String, String>> relationships;
@@ -136,145 +133,74 @@ public class DataSeeder {
             relationships = gson.fromJson(reader, relationshipListType);
         }
 
-        System.out.println("✅ " + relationships.size() + " relacionamentos carregados");
         System.out.println("\n🔄 Criando relacionamentos no Neo4j...");
-        System.out.println("   (Isso pode levar alguns minutos...)");
 
         int successCount = 0;
         int errorCount = 0;
 
-        for (int i = 0; i < relationships.size(); i++) {
+        for (Map<String, String> rel : relationships) {
             try {
-                Map<String, String> rel = relationships.get(i);
                 String followerId = rel.get("followerId");
                 String followedId = rel.get("followedId");
 
                 userService.followUser(followerId, followedId);
                 successCount++;
 
-                // Mostrar progresso a cada 500 relacionamentos
-                if (successCount % 500 == 0) {
-                    System.out.println("   ⏳ " + successCount + "/" + relationships.size() + " relacionamentos criados...");
-                }
+                if (successCount % 500 == 0) System.out.println("   ⏳ " + successCount + " relações...");
 
             } catch (Exception e) {
                 errorCount++;
-                // Não mostrar erro para cada relacionamento para não poluir o console
-                if (errorCount % 100 == 0) {
-                    System.err.println("⚠️ " + errorCount + " erros até agora...");
-                }
             }
         }
 
         System.out.println("\n✅ Relacionamentos criados: " + successCount);
-        if (errorCount > 0) {
-            System.out.println("⚠️ Erros: " + errorCount);
-        }
     }
 
     /**
-     * Converte Map para AggregatedUser
+     * Parse Manual (Mantido da sua lógica original pois funciona bem com o Map)
      */
     @SuppressWarnings("unchecked")
     private AggregatedUser parseUser(Map<String, Object> data) {
         AggregatedUser user = new AggregatedUser();
 
-        // Parse credentials
+        // Parse credentials (Postgres)
         Map<String, Object> credData = (Map<String, Object>) data.get("credentials");
         if (credData != null) {
             UserCredential cred = new UserCredential();
-            cred.setUserId((String) credData.get("userId"));
+            cred.setUserId(String.valueOf(credData.get("userId"))); // Garante String
             cred.setEmail((String) credData.get("email"));
             cred.setPasswordHash((String) credData.get("passwordHash"));
             user.setCredentials(cred);
         }
 
-        // Parse profile
+        // Parse profile (Mongo)
         Map<String, Object> profileData = (Map<String, Object>) data.get("profile");
         if (profileData != null) {
             UserProfile profile = new UserProfile();
-            profile.setUserId((String) profileData.get("userId"));
+            profile.setUserId(String.valueOf(profileData.get("userId")));
 
-            // Age pode vir como Double ou Integer
+            // Tratamento robusto para números (JSON pode vir como Double ou Integer)
             Object ageObj = profileData.get("age");
-            if (ageObj != null) {
-                if (ageObj instanceof Double) {
-                    profile.setAge(((Double) ageObj).intValue());
-                } else if (ageObj instanceof Integer) {
-                    profile.setAge((Integer) ageObj);
-                }
-            }
+            if (ageObj instanceof Number) profile.setAge(((Number) ageObj).intValue());
 
             profile.setCountry((String) profileData.get("country"));
             profile.setSubscriptionType((String) profileData.get("subscriptionType"));
             profile.setDevice((String) profileData.get("device"));
             profile.setGender((String) profileData.get("gender"));
 
-            // Monthly revenue
             Object revenueObj = profileData.get("monthlyRevenue");
-            if (revenueObj != null) {
-                if (revenueObj instanceof Double) {
-                    profile.setMonthlyRevenue((Double) revenueObj);
-                } else if (revenueObj instanceof Integer) {
-                    profile.setMonthlyRevenue(((Integer) revenueObj).doubleValue());
-                }
-            }
+            if (revenueObj instanceof Number) profile.setMonthlyRevenue(((Number) revenueObj).doubleValue());
 
-            // Genres
-            List<String> genres = (List<String>) profileData.get("genres");
-            profile.setGenres(genres);
-
+            profile.setGenres((List<String>) profileData.get("genres"));
             user.setProfile(profile);
         }
 
-        // Parse login count
+        // Parse login count (Redis)
         Object loginCountObj = data.get("loginCount");
-        if (loginCountObj != null) {
-            if (loginCountObj instanceof Double) {
-                user.setLoginCount(((Double) loginCountObj).intValue());
-            } else if (loginCountObj instanceof Integer) {
-                user.setLoginCount((Integer) loginCountObj);
-            }
+        if (loginCountObj instanceof Number) {
+            user.setLoginCount(((Number) loginCountObj).intValue());
         }
 
         return user;
-    }
-
-    /**
-     * Limpa todos os dados dos bancos
-     */
-    public void clearAll() {
-        System.out.println("\n⚠️ LIMPANDO TODOS OS DADOS...");
-        System.out.println("   (Esta operação não pode ser desfeita!)");
-
-        try {
-            // Aqui você implementaria métodos para limpar cada banco
-            System.out.println("🧹 Limpeza não implementada ainda.");
-            System.out.println("💡 Use o menu de cada banco para limpar manualmente:");
-            System.out.println("   - PostgreSQL: TRUNCATE TABLE user_credentials;");
-            System.out.println("   - MongoDB: db.user_profiles.deleteMany({})");
-            System.out.println("   - Redis: FLUSHDB");
-            System.out.println("   - Neo4j: MATCH (n) DETACH DELETE n");
-
-        } catch (Exception e) {
-            System.err.println("❌ Erro ao limpar dados: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Main para executar seed independentemente
-     */
-    public static void main(String[] args) {
-        System.out.println("🚀 Executando DataSeeder standalone...\n");
-
-        DataSeeder seeder = new DataSeeder();
-
-        // Verificar se deve limpar antes
-        if (args.length > 0 && args[0].equals("--clear")) {
-            seeder.clearAll();
-            return;
-        }
-
-        seeder.seedAll();
     }
 }
