@@ -1,0 +1,51 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Netflix Distributed Users</h2>
+
+    <div class="btn-group">
+      <button class="btn btn-outline-primary"
+              [class.active]="selectedSource === ''"
+              (click)="onFilterChange('')">Todos</button>
+      <button class="btn btn-outline-secondary"
+              [class.active]="selectedSource === 'postgres'"
+              (click)="onFilterChange('postgres')">🐘 Postgres</button>
+      <button class="btn btn-outline-success"
+              [class.active]="selectedSource === 'mongo'"
+              (click)="onFilterChange('mongo')">🍃 Mongo</button>
+      <button class="btn btn-outline-info"
+              [class.active]="selectedSource === 'neo4j'"
+              (click)="onFilterChange('neo4j')">🕸️ Neo4j</button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center">
+    <div class="spinner-border" role="status"></div>
+  </div>
+
+  <div class="row" *ngIf="!loading">
+    <div class="col-md-4 mb-3" *ngFor="let user of users">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{ user.email }}</h5>
+          <h6 class="card-subtitle mb-2 text-muted" *ngIf="user.country">
+            📍 {{ user.country }}
+          </h6>
+
+          <p class="card-text">
+            <strong>Gêneros:</strong> {{ user.genres?.join(', ') || 'N/A' }}<br>
+            <strong>Logins:</strong> {{ user.loginCount }}
+          </p>
+
+          <hr>
+
+          <div class="d-flex gap-2">
+            <span *ngIf="isSavedIn(user, 'PostgreSQL')" class="badge bg-secondary" title="Salvo no PostgreSQL">PG</span>
+            <span *ngIf="isSavedIn(user, 'MongoDB')" class="badge bg-success" title="Salvo no MongoDB">MG</span>
+            <span *ngIf="isSavedIn(user, 'Redis')" class="badge bg-danger" title="Cache no Redis">RD</span>
+            <span *ngIf="isSavedIn(user, 'Neo4j')" class="badge bg-info text-dark" title="Nó no Neo4j">G</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,48 +1,32 @@
 package com.academia.bancos.controller;
 
-import com.academia.bancos.model.AggregatedUser;
+import com.academia.bancos.model.dto.UserDTO;
 import com.academia.bancos.service.UserService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-
 @RestController
-@RequestMapping("/users")
-@CrossOrigin(origins = "*") // Resolve o problema do Angular automaticamente!
-@RequiredArgsConstructor
+@RequestMapping("/api/users")
+@CrossOrigin(origins = "http://localhost:4200") // Para o Angular
 public class UserController {
 
-    private final UserService userService;
-
-    @GetMapping
-    public ResponseEntity<List<AggregatedUser>> listarTodos() {
-        return ResponseEntity.ok(userService.listAllUsers());
-    }
+    @Autowired
+    private UserService userService;
 
     @PostMapping
-    public ResponseEntity<AggregatedUser> criar(@RequestBody AggregatedUser user) {
-        userService.createUser(user);
-        return ResponseEntity.status(201).body(user);
+    public ResponseEntity<UserDTO> create(@RequestBody UserDTO user) {
+        return ResponseEntity.ok(userService.createUser(user));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AggregatedUser> buscar(@PathVariable String id) {
-        return ResponseEntity.ok(userService.getUser(id));
+    public ResponseEntity<UserDTO> getById(@PathVariable String id) {
+        return ResponseEntity.ok(userService.getUserAggregated(id));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable String id) {
-        userService.deleteUser(id); // Adicione este método no Service se não tiver
-        return ResponseEntity.noContent().build();
-    }
-
-    // Endpoint específico para ação de seguir (Neo4j)
-    @PostMapping("/{id}/follow")
-    public ResponseEntity<?> seguir(@PathVariable String id, @RequestBody Map<String, String> body) {
-        userService.followUser(id, body.get("followedId")); // Adicione no Service
-        return ResponseEntity.ok().build();
+    // Exemplo: /api/users?source=mongo
+    @GetMapping
+    public ResponseEntity<Object> listAll(@RequestParam(required = false) String source) {
+        return ResponseEntity.ok(userService.getAllUsers(source));
     }
 }

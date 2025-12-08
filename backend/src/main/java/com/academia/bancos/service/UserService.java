@@ -1,224 +1,99 @@
 package com.academia.bancos.service;
 
-import com.academia.bancos.model.*;
+import com.academia.bancos.model.document.UserProfileDoc;
+import com.academia.bancos.model.dto.UserDTO;
+import com.academia.bancos.model.entity.UserEntity;
+import com.academia.bancos.model.node.UserNode;
 import com.academia.bancos.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-/**
- * Service agregador que coordena operações entre todos os bancos
- * Responsável por manter consistência entre PostgreSQL, MongoDB, Neo4j e Redis
- */
+@Service
 public class UserService {
 
-    private final PostgresUserRepository postgresRepo;
-    private final MongoUserRepository mongoRepo;
-    private final Neo4jUserRepository neo4jRepo;
-    private final RedisUserService redisService;
+    @Autowired private UserRepositoryPG postgresRepo;
+    @Autowired private UserRepositoryMongo mongoRepo;
+    @Autowired private UserRepositoryNeo4j neo4jRepo;
+    @Autowired private StringRedisTemplate redisTemplate; // Para contadores simples
 
-    public UserService() {
-        this.postgresRepo = new PostgresUserRepository();
-        this.mongoRepo = new MongoUserRepository();
-        this.neo4jRepo = new Neo4jUserRepository();
-        this.redisService = new RedisUserService();
-        System.out.println("✅ UserService agregador inicializado");
+    // Criar Usuário em Todos os Bancos
+    @Transactional
+    public UserDTO createUser(UserDTO dto) {
+        List<String> savedIn = new ArrayList<>();
+
+        // 1. PostgreSQL (Dados Críticos)
+        UserEntity entity = new UserEntity();
+        entity.setUserId(dto.getUserId());
+        entity.setEmail(dto.getEmail());
+        entity.setPasswordHash(dto.getPassword()); // Em prod, usar encoder
+        postgresRepo.save(entity);
+        savedIn.add("PostgreSQL");
+
+        // 2. MongoDB (Perfil)
+        UserProfileDoc doc = new UserProfileDoc();
+        doc.setUserId(dto.getUserId());
+        doc.setAge(dto.getAge());
+        doc.setCountry(dto.getCountry());
+        doc.setGenres(dto.getGenres());
+        mongoRepo.save(doc);
+        savedIn.add("MongoDB");
+
+        // 3. Neo4j (Grafo)
+        UserNode node = new UserNode();
+        node.setUserId(dto.getUserId());
+        neo4jRepo.save(node);
+        savedIn.add("Neo4j");
+
+        // 4. Redis (Inicializar Login Count)
+        redisTemplate.opsForValue().set("login_count:" + dto.getUserId(), "0");
+        savedIn.add("Redis");
+
+        dto.setSavedIn(savedIn);
+        return dto;
     }
 
-    /**
-     * Cria um usuário completo em todos os bancos
-     * @param aggregatedUser dados completos do usuário
-     */
-    public void createUser(AggregatedUser aggregatedUser) {
-        String userId = aggregatedUser.getUserId();
-
-        try {
-            // 1. Salvar credenciais no PostgreSQL
-            if (aggregatedUser.getCredentials() != null) {
-                postgresRepo.save(aggregatedUser.getCredentials());
-            }
-
-            // 2. Salvar perfil no MongoDB
-            if (aggregatedUser.getProfile() != null) {
-                mongoRepo.save(aggregatedUser.getProfile());
-            }
-
-            // 3. Criar nó no Neo4j
-            neo4jRepo.createUserNode(userId);
-
-            // 4. Inicializar contador no Redis
-            redisService.initUser(userId);
-
-            System.out.println("✅ Usuário criado: " + userId);
-
-        } catch (Exception e) {
-            // Rollback em caso de erro
-            rollbackUserCreation(userId);
-            throw new RuntimeException("Erro ao criar usuário: " + e.getMessage(), e);
+    // Buscar filtrando por "source"
+    public Object getAllUsers(String source) {
+        if ("postgres".equalsIgnoreCase(source)) {
+            return postgresRepo.findAll();
+        } else if ("mongo".equalsIgnoreCase(source)) {
+            return mongoRepo.findAll();
+        } else if ("neo4j".equalsIgnoreCase(source)) {
+            return neo4jRepo.findAll();
+        } else {
+            // Default: Retorna lista simples do Postgres
+            return postgresRepo.findAll();
         }
     }
 
-    /**
-     * Busca usuário agregando dados de todos os bancos
-     * @param userId ID do usuário
-     * @return dados completos do usuário
-     */
-    public AggregatedUser getUser(String userId) {
-        AggregatedUser user = new AggregatedUser();
+    // Método para agregar dados de um usuário específico
+    public UserDTO getUserAggregated(String userId) {
+        UserDTO dto = new UserDTO();
+        dto.setUserId(userId);
 
-        // 1. Buscar credenciais no PostgreSQL
-        UserCredential credentials = postgresRepo.findByUserId(userId);
-        if (credentials == null) {
-            throw new RuntimeException("Usuário não encontrado: " + userId);
-        }
-        user.setCredentials(credentials);
+        // Busca PG
+        postgresRepo.findById(userId).ifPresent(u -> {
+            dto.setEmail(u.getEmail());
+            dto.setPassword(u.getPasswordHash());
+        });
 
-        // 2. Buscar perfil no MongoDB
-        UserProfile profile = mongoRepo.findByUserId(userId);
-        user.setProfile(profile);
+        // Busca Mongo
+        mongoRepo.findById(userId).ifPresent(u -> {
+            dto.setAge(u.getAge());
+            dto.setCountry(u.getCountry());
+            dto.setGenres(u.getGenres());
+        });
 
-        // 3. Buscar relações no Neo4j
-        UserGraph relations = new UserGraph();
-        relations.setFollowers(neo4jRepo.getFollowers(userId));
-        relations.setFollowing(neo4jRepo.getFollowing(userId));
-        user.setRelations(relations);
+        // Busca Redis
+        String count = redisTemplate.opsForValue().get("login_count:" + userId);
+        dto.setLoginCount(count != null ? Integer.parseInt(count) : 0);
 
-        // 4. Buscar contador de logins no Redis
-        int loginCount = redisService.getLoginCount(userId);
-        user.setLoginCount(loginCount);
-
-        return user;
-    }
-
-    /**
-     * Atualiza dados do usuário
-     * @param aggregatedUser dados atualizados
-     */
-    public void updateUser(AggregatedUser aggregatedUser) {
-        String userId = aggregatedUser.getUserId();
-
-        // Verificar se usuário existe
-        if (!postgresRepo.exists(userId)) {
-            throw new RuntimeException("Usuário não encontrado: " + userId);
-        }
-
-        // Atualizar credenciais se fornecidas
-        if (aggregatedUser.getCredentials() != null) {
-            postgresRepo.update(aggregatedUser.getCredentials());
-        }
-
-        // Atualizar perfil se fornecido
-        if (aggregatedUser.getProfile() != null) {
-            mongoRepo.update(aggregatedUser.getProfile());
-        }
-
-        System.out.println("✅ Usuário atualizado: " + userId);
-    }
-
-    /**
-     * Deleta usuário de todos os bancos
-     * @param userId ID do usuário a ser deletado
-     */
-    public void deleteUser(String userId) {
-        try {
-            // 1. Deletar do PostgreSQL
-            postgresRepo.delete(userId);
-
-            // 2. Deletar do MongoDB
-            mongoRepo.delete(userId);
-
-            // 3. Deletar do Neo4j (remove nó e relações)
-            neo4jRepo.deleteUserNode(userId);
-
-            // 4. Deletar do Redis
-            redisService.deleteUser(userId);
-
-            System.out.println("✅ Usuário deletado: " + userId);
-
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao deletar usuário: " + e.getMessage(), e);
-        }
-    }
-
-    /**
-     * Lista todos os usuários (agregado básico sem relações completas)
-     * @return lista de usuários agregados
-     */
-    public List<AggregatedUser> listAllUsers() {
-        List<UserCredential> credentials = postgresRepo.findAll();
-        List<AggregatedUser> users = new ArrayList<>();
-
-        for (UserCredential cred : credentials) {
-            try {
-                AggregatedUser user = getUser(cred.getUserId());
-                users.add(user);
-            } catch (Exception e) {
-                System.err.println("⚠️ Erro ao carregar usuário " + cred.getUserId());
-            }
-        }
-
-        return users;
-    }
-
-    /**
-     * Cria relação de follow entre usuários
-     * @param followerId ID de quem segue
-     * @param followedId ID de quem é seguido
-     */
-    public void followUser(String followerId, String followedId) {
-        // Verificar se ambos existem
-        if (!postgresRepo.exists(followerId)) {
-            throw new RuntimeException("Follower não encontrado: " + followerId);
-        }
-        if (!postgresRepo.exists(followedId)) {
-            throw new RuntimeException("Followed não encontrado: " + followedId);
-        }
-
-        neo4jRepo.createFollowRelationship(followerId, followedId);
-        System.out.println("✅ " + followerId + " agora segue " + followedId);
-    }
-
-    /**
-     * Remove relação de follow
-     * @param followerId ID de quem segue
-     * @param followedId ID de quem é seguido
-     */
-    public void unfollowUser(String followerId, String followedId) {
-        neo4jRepo.removeFollowRelationship(followerId, followedId);
-        System.out.println("✅ " + followerId + " deixou de seguir " + followedId);
-    }
-
-    /**
-     * Registra um login do usuário
-     * @param userId ID do usuário
-     */
-    public void registerLogin(String userId) {
-        redisService.incrementLogin(userId);
-        System.out.println("✅ Login registrado para: " + userId);
-    }
-
-    /**
-     * Verifica se usuário existe
-     * @param userId ID do usuário
-     * @return true se existe
-     */
-
-    public boolean userExists(String userId) {
-        return postgresRepo.exists(userId);
-    }
-
-    /**
-     * Rollback em caso de erro na criação
-     */
-    private void rollbackUserCreation(String userId) {
-        try {
-            postgresRepo.delete(userId);
-            mongoRepo.delete(userId);
-            neo4jRepo.deleteUserNode(userId);
-            redisService.deleteUser(userId);
-            System.out.println("⚠️ Rollback executado para: " + userId);
-        } catch (Exception e) {
-            System.err.println("❌ Erro no rollback: " + e.getMessage());
-        }
+        return dto;
     }
 }
