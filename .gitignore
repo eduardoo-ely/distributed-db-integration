@@ -38,9 +38,6 @@ __pycache__/
 # ============================
 # Dataset baixado localmente
 # ============================
-netflix_userbase.json
-relationships.json
-download_netflix_dataset.py
 *.csv
 
 # ============================
