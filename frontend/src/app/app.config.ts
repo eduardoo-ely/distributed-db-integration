@@ -1,12 +1,12 @@
 import { ApplicationConfig } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http'; // Importante para API
+import { provideHttpClient, withFetch } from '@angular/common/http'; // IMPORTANTE
 
-import { routes } from './app.routes'; // Certifique-se que este arquivo existe (padrão)
+import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
-    provideHttpClient()
+    provideHttpClient(withFetch()) // Habilita requisições HTTP para todo o app
   ]
 };

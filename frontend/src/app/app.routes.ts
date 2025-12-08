@@ -1,7 +1,9 @@
 import { Routes } from '@angular/router';
-import { UserListComponent } from './components/user-list/user-list.component';
+import { LoginComponent } from './components/login/login.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
 
 export const routes: Routes = [
-  { path: '', component: UserListComponent },
-  { path: '**', redirectTo: '' }
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: 'login', component: LoginComponent },
+  { path: 'dashboard', component: DashboardComponent }
 ];
