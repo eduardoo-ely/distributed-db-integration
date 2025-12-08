@@ -29,11 +29,18 @@ public class UserController {
     }
 
     // ==================== READ ====================
+    // ==================== READ ====================
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getById(@PathVariable String id) {
         try {
+           if ("me".equalsIgnoreCase(id)) {
+                System.out.println("🔄 Redirecionando pedido '/me' para 'admin-master'");
+                id = "admin-master";
+            }
+
             UserDTO user = userService.getUserAggregated(id);
-            if (user.getEmail() == null) {
+
+            if (user == null || user.getEmail() == null) {
                 return ResponseEntity.notFound().build();
             }
             return ResponseEntity.ok(user);

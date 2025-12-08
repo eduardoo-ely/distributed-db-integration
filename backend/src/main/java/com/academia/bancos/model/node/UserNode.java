@@ -1,10 +1,12 @@
 package com.academia.bancos.model.node;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
-import com.fasterxml.jackson.annotation.JsonIgnore; // <--- 1. Importe isto
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,6 +18,8 @@ public class UserNode {
 
     @JsonIgnore
     @Relationship(type = "FOLLOWS", direction = Relationship.Direction.OUTGOING)
+    @ToString.Exclude           // <--- ADICIONE ISSO
+    @EqualsAndHashCode.Exclude
     private Set<UserNode> following = new HashSet<>();
 
     public void follows(UserNode user) {

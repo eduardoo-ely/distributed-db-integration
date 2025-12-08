@@ -12,12 +12,13 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class DataSeeder implements CommandLineRunner {
@@ -28,84 +29,118 @@ public class DataSeeder implements CommandLineRunner {
     @Autowired private StringRedisTemplate redisTemplate;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private static final int BATCH_SIZE = 100; // Processa 100 por vez
+    private static final int BATCH_SIZE = 50;
+
+    // ================= CONFIGURAÇÕES DE LIMITES =================
+    private static final int USER_LIMIT = 50;           // Carrega apenas 50 usuários
+    private static final int RELATIONSHIP_TARGET = 300; // Tenta criar até 300 relacionamentos
+    // ============================================================
+
+    // === ADMIN CONFIG ===
+    private static final String ADMIN_ID = "admin-master";
+    private static final String ADMIN_EMAIL = "admin@admin.com";
+    // ====================
 
     @Override
     public void run(String... args) {
         System.out.println("\n");
         System.out.println("╔══════════════════════════════════════════════════════╗");
-        System.out.println("║       🌱 INICIANDO SEED DOS BANCOS DE DADOS 🌱      ║");
+        System.out.println("║   🌱 SEED OTIMIZADO (+ ADMIN) (Users: " + USER_LIMIT + ")    ║");
         System.out.println("╚══════════════════════════════════════════════════════╝");
         System.out.println();
 
         try {
-            long existingUsers = postgresRepo.count();
+            System.out.println("♻️  Limpando bancos antigos...");
+            postgresRepo.deleteAll();
+            mongoRepo.deleteAll();
+            neo4jRepo.deleteAll();
+            try {
+                var keys = redisTemplate.keys("login_count:*");
+                if (keys != null && !keys.isEmpty()) {
+                    redisTemplate.delete(keys);
+                }
+            } catch (Exception e) { /* ignora erro redis */ }
 
-            if (existingUsers > 0) {
-                System.out.println("⚠️  ATENÇÃO: Já existem " + existingUsers + " usuários cadastrados!");
-                System.out.println("⏭️  Pulando seed para evitar duplicação...\n");
-                showDatabaseStats();
-                return;
-            }
-
-            System.out.println("✅ Bancos vazios. Iniciando importação com BATCH PROCESSING...\n");
+            System.out.println("✅ Bancos limpos. Iniciando carga...\n");
 
             loadUsers();
             loadRelationships();
 
             System.out.println("\n");
             System.out.println("╔══════════════════════════════════════════════════════╗");
-            System.out.println("║          ✅ SEED FINALIZADO COM SUCESSO! ✅          ║");
+            System.out.println("║           ✅ SEED FINALIZADO COM SUCESSO! ✅         ║");
             System.out.println("╚══════════════════════════════════════════════════════╝");
             System.out.println();
 
             showDatabaseStats();
 
         } catch (Exception e) {
-            System.err.println("\n❌ ERRO CRÍTICO AO EXECUTAR SEED:");
-            System.err.println("   " + e.getMessage());
+            System.err.println("\n❌ ERRO NO SEED: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    @Transactional
     public void loadUsers() throws Exception {
         System.out.println("┌────────────────────────────────────────────────────┐");
-        System.out.println("│  📥 IMPORTANDO USUÁRIOS (netflix_userbase.json)   │");
+        System.out.println("│   📥 IMPORTANDO USUÁRIOS (Limitado a " + USER_LIMIT + ")          │");
         System.out.println("└────────────────────────────────────────────────────┘");
-        System.out.println();
 
         InputStream inputStream = new ClassPathResource("netflix_userbase.json").getInputStream();
         List<Map<String, Object>> usersMap = objectMapper.readValue(inputStream, new TypeReference<>() {});
 
-        int total = usersMap.size();
+        int totalToProcess = Math.min(usersMap.size(), USER_LIMIT);
         int successCount = 0;
-        int errorCount = 0;
-        long startTime = System.currentTimeMillis();
 
-        System.out.println("📊 Total de usuários no JSON: " + total);
-        System.out.println("⚡ Processando em lotes de " + BATCH_SIZE + " registros");
-        System.out.println();
-
-        // Listas para batch
         List<UserEntity> pgBatch = new ArrayList<>();
         List<UserProfileDoc> mongoBatch = new ArrayList<>();
         List<UserNode> neo4jBatch = new ArrayList<>();
 
-        for (int i = 0; i < usersMap.size(); i++) {
+        // =================================================================================
+        // 🚀 ADICIONANDO ADMIN MANUALMENTE (Pode apagar este bloco depois)
+        // =================================================================================
+        System.out.println("⚡ Criando usuário ADMIN...");
+
+        // 1. Postgres Admin
+        UserEntity adminPG = new UserEntity();
+        adminPG.setUserId(ADMIN_ID);
+        adminPG.setEmail(ADMIN_EMAIL);
+        adminPG.setPasswordHash("123456"); // Senha padrão para testes
+        pgBatch.add(adminPG);
+
+        // 2. Mongo Admin
+        UserProfileDoc adminMongo = new UserProfileDoc();
+        adminMongo.setUserId(ADMIN_ID);
+        adminMongo.setAge(30);
+        adminMongo.setCountry("Brazil");
+        adminMongo.setGenres(Arrays.asList("Action", "Sci-Fi", "Tech"));
+        mongoBatch.add(adminMongo);
+
+        // 3. Neo4j Admin
+        UserNode adminNeo = new UserNode();
+        adminNeo.setUserId(ADMIN_ID);
+        neo4jBatch.add(adminNeo);
+
+        // 4. Redis Admin
+        redisTemplate.opsForValue().set("login_count:" + ADMIN_ID, "999");
+        // =================================================================================
+
+        for (int i = 0; i < totalToProcess; i++) {
             Map<String, Object> map = usersMap.get(i);
 
             try {
                 UserDTO dto = mapToDto(map);
 
-                // 1. PostgreSQL
+                // Evita criar duplicado se o JSON tiver o mesmo ID (improvável, mas seguro)
+                if (dto.getUserId().equals(ADMIN_ID)) continue;
+
+                // 1. Postgres
                 UserEntity entity = new UserEntity();
                 entity.setUserId(dto.getUserId());
                 entity.setEmail(dto.getEmail() != null ? dto.getEmail() : "");
                 entity.setPasswordHash(dto.getPassword() != null ? dto.getPassword() : "");
                 pgBatch.add(entity);
 
-                // 2. MongoDB
+                // 2. Mongo
                 UserProfileDoc doc = new UserProfileDoc();
                 doc.setUserId(dto.getUserId());
                 doc.setAge(dto.getAge());
@@ -118,85 +153,45 @@ public class DataSeeder implements CommandLineRunner {
                 node.setUserId(dto.getUserId());
                 neo4jBatch.add(node);
 
-                // 4. Redis (salva individual, é rápido)
-                String loginCount = dto.getLoginCount() != null ?
-                        dto.getLoginCount().toString() : "0";
+                // 4. Redis
+                String loginCount = dto.getLoginCount() != null ? dto.getLoginCount().toString() : "0";
                 redisTemplate.opsForValue().set("login_count:" + dto.getUserId(), loginCount);
 
                 successCount++;
 
-                // Salva batch quando atingir o tamanho
-                if (pgBatch.size() >= BATCH_SIZE || i == usersMap.size() - 1) {
-                    try {
-                        postgresRepo.saveAll(pgBatch);
-                        postgresRepo.flush();
-                    } catch (Exception e) {
-                        System.err.println("❌ Erro batch PostgreSQL: " + e.getMessage());
-                        errorCount += pgBatch.size();
-                    }
+                // Salva em batch
+                if (pgBatch.size() >= BATCH_SIZE || i == totalToProcess - 1) {
+                    postgresRepo.saveAll(pgBatch);
+                    postgresRepo.flush();
+                    mongoRepo.saveAll(mongoBatch);
+                    neo4jRepo.saveAll(neo4jBatch);
 
-                    try {
-                        mongoRepo.saveAll(mongoBatch);
-                    } catch (Exception e) {
-                        System.err.println("❌ Erro batch MongoDB: " + e.getMessage());
-                    }
-
-                    try {
-                        neo4jRepo.saveAll(neo4jBatch);
-                    } catch (Exception e) {
-                        System.err.println("❌ Erro batch Neo4j: " + e.getMessage());
-                    }
-
-                    // Limpa batches
                     pgBatch.clear();
                     mongoBatch.clear();
                     neo4jBatch.clear();
-                }
 
-                // Atualiza progresso a cada 50 registros
-                if ((i + 1) % 50 == 0 || i == usersMap.size() - 1) {
-                    printProgress(i + 1, total, successCount, errorCount, startTime);
+                    System.out.print("."); // Indicador visual simples
                 }
 
             } catch (Exception e) {
-                errorCount++;
-                if (errorCount <= 3) {
-                    System.err.println("\n   ❌ Erro no usuário " + map.get("userId") + ": " + e.getMessage());
-                }
+                System.err.println("   ❌ Erro user " + map.get("userId") + ": " + e.getMessage());
             }
         }
-
-        long duration = (System.currentTimeMillis() - startTime) / 1000;
-        System.out.println("\n");
-        System.out.println("  ✅ Usuários processados: " + successCount + " de " + total);
-        if (errorCount > 0) {
-            System.out.println("  ⚠️  Erros encontrados: " + errorCount);
-        }
-        System.out.println("  ⏱️  Tempo decorrido: " + duration + "s");
-        System.out.println("  🚀 Velocidade: " + (successCount / Math.max(duration, 1)) + " usuários/s");
-        System.out.println();
+        System.out.println("\n   ✅ Usuários importados: " + successCount + " (+ Admin)");
     }
 
-    @Transactional
     public void loadRelationships() throws Exception {
-        System.out.println("┌────────────────────────────────────────────────────┐");
-        System.out.println("│  🕸️  IMPORTANDO RELACIONAMENTOS (relationships)   │");
+        System.out.println("\n┌────────────────────────────────────────────────────┐");
+        System.out.println("│   🕸️  IMPORTANDO RELACIONAMENTOS (Meta: " + RELATIONSHIP_TARGET + ")        │");
         System.out.println("└────────────────────────────────────────────────────┘");
-        System.out.println();
 
         InputStream inputStream = new ClassPathResource("relationships.json").getInputStream();
         List<Map<String, String>> relations = objectMapper.readValue(inputStream, new TypeReference<>() {});
 
-        int total = relations.size();
         int successCount = 0;
-        int errorCount = 0;
-        long startTime = System.currentTimeMillis();
 
-        System.out.println("📊 Total de relacionamentos no JSON: " + total);
-        System.out.println();
-
-        for (int i = 0; i < relations.size(); i++) {
-            Map<String, String> rel = relations.get(i);
+        for (Map<String, String> rel : relations) {
+            if (successCount >= RELATIONSHIP_TARGET) break;
 
             try {
                 String followerId = rel.get("followerId");
@@ -212,87 +207,47 @@ public class DataSeeder implements CommandLineRunner {
                         follower.follows(followed);
                         neo4jRepo.save(follower);
                         successCount++;
-                    } else {
-                        errorCount++;
                     }
                 }
+            } catch (Exception e) { /* ignora falhas individuais */ }
+        }
+        System.out.println("   ✅ Relacionamentos do JSON criados: " + successCount);
 
-                // Atualiza progresso a cada 100 relacionamentos
-                if ((i + 1) % 100 == 0 || i == relations.size() - 1) {
-                    printProgress(i + 1, total, successCount, errorCount, startTime);
-                }
+        // =================================================================================
+        // 🚀 FORÇANDO CONEXÕES DO ADMIN (Para testes de visualização)
+        // =================================================================================
+        System.out.println("⚡ Conectando ADMIN a usuários aleatórios para testes...");
+        var adminOpt = neo4jRepo.findById(ADMIN_ID);
 
-            } catch (Exception e) {
-                errorCount++;
-                if (errorCount <= 3) {
-                    System.err.println("\n   ❌ Erro no relacionamento: " + e.getMessage());
-                }
+        if (adminOpt.isPresent()) {
+            UserNode admin = adminOpt.get();
+            // Pega os 5 primeiros usuários que NÃO sejam o admin
+            List<UserNode> randomUsers = neo4jRepo.findAll().stream()
+                    .filter(u -> !u.getUserId().equals(ADMIN_ID))
+                    .limit(5)
+                    .collect(Collectors.toList());
+
+            for (UserNode user : randomUsers) {
+                // Admin segue o usuário
+                admin.follows(user);
+                // Usuário segue o Admin (pra ficar legal no grafo)
+                user.follows(admin);
+
+                neo4jRepo.save(user); // Salva o user com a nova relação
             }
+            neo4jRepo.save(admin); // Salva o admin com as novas relações
+            System.out.println("   ✅ Admin conectado a " + randomUsers.size() + " usuários (Bidirecional)");
+        } else {
+            System.err.println("   ❌ Admin não encontrado no Neo4j para criar relações.");
         }
-
-        long duration = (System.currentTimeMillis() - startTime) / 1000;
-        System.out.println("\n");
-        System.out.println("  ✅ Relacionamentos criados: " + successCount + " de " + total);
-        if (errorCount > 0) {
-            System.out.println("  ⚠️  Erros/Não encontrados: " + errorCount);
-        }
-        System.out.println("  ⏱️  Tempo decorrido: " + duration + "s");
-        System.out.println();
-    }
-
-    private void printProgress(int current, int total, int success, int errors, long startTime) {
-        int percentage = (int) ((current * 100.0) / total);
-        int barLength = 40;
-        int filled = (int) ((current * barLength) / total);
-
-        StringBuilder bar = new StringBuilder("  [");
-        for (int i = 0; i < barLength; i++) {
-            bar.append(i < filled ? "█" : "░");
-        }
-        bar.append("]");
-
-        long elapsed = System.currentTimeMillis() - startTime;
-        long estimated = current > 0 ? (elapsed * total / current) - elapsed : 0;
-        int etaSeconds = (int) (estimated / 1000);
-
-        System.out.print("\r" + bar +
-                " " + percentage + "%" +
-                " | " + current + "/" + total +
-                " | ✓ " + success +
-                (errors > 0 ? " | ✗ " + errors : "") +
-                " | ETA: " + etaSeconds + "s   ");
+        // =================================================================================
     }
 
     private void showDatabaseStats() {
-        System.out.println("┌────────────────────────────────────────────────────┐");
-        System.out.println("│           📊 ESTATÍSTICAS DOS BANCOS               │");
-        System.out.println("└────────────────────────────────────────────────────┘");
-        System.out.println();
-
-        try {
-            long pgCount = postgresRepo.count();
-            long mongoCount = mongoRepo.count();
-            long neo4jCount = neo4jRepo.count();
-
-            var keys = redisTemplate.keys("login_count:*");
-            long redisCount = keys != null ? keys.size() : 0;
-
-            System.out.println("  🐘 PostgreSQL:  " + pgCount + " usuários");
-            System.out.println("  🍃 MongoDB:     " + mongoCount + " perfis");
-            System.out.println("  🔴 Redis:       " + redisCount + " contadores");
-            System.out.println("  🕸️  Neo4j:      " + neo4jCount + " nós");
-
-            // Alerta se números não batem
-            if (pgCount != mongoCount || pgCount != neo4jCount || pgCount != redisCount) {
-                System.out.println();
-                System.out.println("  ⚠️  AVISO: Números inconsistentes entre bancos!");
-                System.out.println("  💡 Isso pode indicar falhas na inserção.");
-            }
-
-            System.out.println();
-        } catch (Exception e) {
-            System.err.println("  ⚠️  Erro ao buscar estatísticas: " + e.getMessage());
-        }
+        System.out.println("\n📊 Status Final:");
+        System.out.println("Postgres: " + postgresRepo.count());
+        System.out.println("Mongo:    " + mongoRepo.count());
+        System.out.println("Neo4j:    " + neo4jRepo.count() + " (Nós)");
     }
 
     private UserDTO mapToDto(Map<String, Object> map) {
@@ -309,20 +264,14 @@ public class DataSeeder implements CommandLineRunner {
         if (profile != null) {
             dto.setAge((Integer) profile.get("age"));
             dto.setCountry((String) profile.get("country"));
-
             Object genresObj = profile.get("genres");
-            if (genresObj instanceof List) {
-                dto.setGenres((List<String>) genresObj);
-            }
+            if (genresObj instanceof List) dto.setGenres((List<String>) genresObj);
         }
 
         Object loginCountObj = map.get("loginCount");
         if (loginCountObj != null) {
-            dto.setLoginCount(loginCountObj instanceof Integer ?
-                    (Integer) loginCountObj :
-                    Integer.parseInt(loginCountObj.toString()));
+            dto.setLoginCount(loginCountObj instanceof Integer ? (Integer) loginCountObj : Integer.parseInt(loginCountObj.toString()));
         }
-
         return dto;
     }
 }
