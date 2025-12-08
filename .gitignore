@@ -39,8 +39,3 @@ __pycache__/
 # Dataset baixado localmente
 # ============================
 *.csv
-
-# ============================
-# Docker
-# ============================
-# (geralmente nada preci
