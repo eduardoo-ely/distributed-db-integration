@@ -1,89 +1,211 @@
-# ==================== BACKEND (Spring Boot) ====================
-backend/HELP.md
-backend/target/
-backend/.mvn/
-backend/mvnw
-backend/mvnw.cmd
-backend/!**/src/main/**/target/
-backend/!**/src/test/**/target/
-
-# IDE
-backend/.idea/
-backend/*.iws
-backend/*.iml
-backend/*.ipr
-backend/.vscode/
-backend/.settings/
-backend/.classpath
-backend/.project
-
-# OS
+# ==================== GERAL ====================
+*.log
+*.tmp
+*.bak
+*.swp
+*~
 .DS_Store
 Thumbs.db
 
-# Logs
-backend/*.log
-backend/logs/
+# ==================== IDE / EDITORES ====================
 
-# ==================== FRONTEND (Angular) ====================
-frontend/node_modules/
-frontend/dist/
-frontend/.angular/
-frontend/.vscode/
-frontend/*.log
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.idea_modules/
 
-# Builds
-frontend/build/
-frontend/out/
+# ==================== JAVA / SPRING BOOT ====================
 
-# IDE
-frontend/.idea/
-frontend/*.iws
-frontend/*.iml
-frontend/*.ipr
-
-# Environment
-frontend/.env
-frontend/.env.local
-frontend/.env.*.local
-
-# ==================== DADOS SENSÍVEIS ====================
-# Arquivos JSON com dados reais (se necessário)
-# backend/src/main/resources/netflix_userbase.json
-# backend/src/main/resources/relationships.json
-
-# Configurações com senhas
-# backend/src/main/resources/application.properties
-# backend/src/main/resources/application.yml
-
-# ==================== DOCKER / DATABASES ====================
-# Volumes de dados locais (se existirem)
-postgres_data/
-mongo_data/
-neo4j_data/
-redis_data/
-
-# Docker
-.docker/
-docker-compose.override.yml
-
-# ==================== GERAL ====================
+# Compiled class files
 *.class
+
+# Package Files
 *.jar
 *.war
+*.nar
 *.ear
 *.zip
 *.tar.gz
 *.rar
 
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Spring Boot
+spring-boot-*.log
+application-*.properties
+application-*.yml
+!application.properties
+!application.yml
+
+# ==================== ANGULAR / NODE ====================
+
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Angular
+/frontend/dist/
+/frontend/tmp/
+/frontend/out-tsc/
+/frontend/.angular/
+/frontend/.sass-cache/
+/frontend/connect.lock/
+/frontend/coverage/
+/frontend/libpeerconnection.log
+/frontend/testem.log
+/frontend/typings
+
+# Angular cache
+.angular/
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# ==================== DATABASES ====================
+
+# PostgreSQL
+*.sql.backup
+*.dump
+
+# MongoDB
+*.bson
+
+# Redis
+dump.rdb
+appendonly.aof
+
+# Neo4j
+*.db
+neo4j/data/
+neo4j/logs/
+
+# H2 Database
+*.h2.db
+*.trace.db
+
+# ==================== DOCKER ====================
+docker-compose.override.yml
+.dockerignore
+
+# ==================== SEGURANÇA ====================
+
+# Arquivos de configuração sensíveis
+*.env
+*.env.local
+*.env.development.local
+*.env.test.local
+*.env.production.local
+.env.*.local
+
+# Chaves e certificados
+*.pem
+*.key
+*.crt
+*.p12
+*.jks
+*.keystore
+
+# Credenciais
+credentials.json
+secrets.yml
+secrets.properties
+
+# ==================== BUILD / DIST ====================
+
+# Build outputs
+dist/
+build/
+out/
+target/
+.build/
+
+# ==================== TESTES ====================
+
+# Coverage reports
+coverage/
+*.lcov
+.nyc_output/
+test-results/
+junit.xml
+
+# ==================== LOGS ====================
+
+# Application logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# ==================== TEMP / CACHE ====================
+
 # Temporary files
+tmp/
+temp/
 *.tmp
-*.bak
-*.swp
+*.cache
+.cache/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ==================== DOCUMENTAÇÃO ====================
+
+# Documentação gerada
+docs/generated/
+javadoc/
+typedoc/
+
+# ==================== OUTROS ====================
+
+# Backup files
+*.backup
 *~
 
-# Package files
-*.dmg
-*.pkg
-*.deb
-*.rpm
+# Lock files (opcional - descomente se quiser versionar)
+package-lock.json
+yarn.lock
+pom.xml.lock
+
+# ==================== PROJETO ESPECÍFICO ====================
+
+# Dados de seed/teste grandes
+/backend/src/main/resources/netflix_userbase.json.backup
+/backend/src/main/resources/relationships.json.backup
+
+# Arquivos de configuração local
+application-local.properties
+application-dev.properties
