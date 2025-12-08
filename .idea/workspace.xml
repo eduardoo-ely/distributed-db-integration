@@ -5,39 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a662654e-54ca-4d75-a13e-3b0a371158ac" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/forwardedPorts.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/academia/bancos/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/academia/bancos/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/academia/bancos/seed/DataSeeder.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/academia/bancos/seed/DataSeeder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/academia/bancos/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/academia/bancos/service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/datasets/netflix_userbase.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/netflix_userbase.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/datasets/relationships.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/relationships.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.angular/cache/21.0.2/frontend-angular/.tsbuildinfo" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.angular/cache/21.0.2/frontend-angular/.tsbuildinfo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.angular/cache/21.0.2/frontend-angular/vite/deps/@angular_common.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.angular/cache/21.0.2/frontend-angular/vite/deps/@angular_common.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.angular/cache/21.0.2/frontend-angular/vite/deps/@angular_common_http.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.angular/cache/21.0.2/frontend-angular/vite/deps/@angular_common_http.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.angular/cache/21.0.2/frontend-angular/vite/deps/@angular_core.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.angular/cache/21.0.2/frontend-angular/vite/deps/@angular_core.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.angular/cache/21.0.2/frontend-angular/vite/deps/@angular_platform-browser.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.angular/cache/21.0.2/frontend-angular/vite/deps/@angular_platform-browser.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.angular/cache/21.0.2/frontend-angular/vite/deps/@angular_router.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.angular/cache/21.0.2/frontend-angular/vite/deps/@angular_router.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.angular/cache/21.0.2/frontend-angular/vite/deps/_metadata.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.angular/cache/21.0.2/frontend-angular/vite/deps/_metadata.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.angular/cache/21.0.2/frontend-angular/vite/deps/chunk-3NESAPK4.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.angular/cache/21.0.2/frontend-angular/vite/deps/chunk-3NESAPK4.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.angular/cache/21.0.2/frontend-angular/vite/deps/chunk-IXWXJAOU.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.angular/cache/21.0.2/frontend-angular/vite/deps/chunk-IXWXJAOU.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.angular/cache/21.0.2/frontend-angular/vite/deps/chunk-JMCMTO3E.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.angular/cache/21.0.2/frontend-angular/vite/deps/chunk-JMCMTO3E.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.angular/cache/21.0.2/frontend-angular/vite/deps/chunk-WDHKEO5U.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.angular/cache/21.0.2/frontend-angular/vite/deps/chunk-WDHKEO5U.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.angular/cache/21.0.2/frontend-angular/vite/deps/chunk-XKWSCZ4C.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.angular/cache/21.0.2/frontend-angular/vite/deps/chunk-XKWSCZ4C.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/components/user-list/user-list.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/components/user-list/user-list.component.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/components/user-list/user-list.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/components/user-list/user-list.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/services/user.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/services/user.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,6 +36,9 @@
     &quot;accountId&quot;: &quot;83df19db-bfe8-461a-a53a-c0e6a98bef01&quot;
   }
 }</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
 }</component>
@@ -79,31 +50,31 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.BancosApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python.download_netflix_dataset.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/eduardo/projetos/bancos-java&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/home/eduardo/.cache/JetBrains/RemoteDev/dist/4acd9412d28fc_ideaIU-252.27397.28/plugins/javascript-plugin/jsLanguageServicesImpl/external&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.BancosApplication.executor": "Run",
+    "Application.Main.executor": "Run",
+    "DefaultHtmlFileTemplate": "HTML File",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.download_netflix_dataset.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/home/eduardo/projetos/bancos-java",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "ts.external.directory.path": "/home/eduardo/.cache/JetBrains/RemoteDev/dist/4acd9412d28fc_ideaIU-252.27397.28/plugins/javascript-plugin/jsLanguageServicesImpl/external",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RdControllerToolWindowsLayoutState" isNewUi="true">
     <layout>
       <window_info id="Bookmarks" side_tool="true" />
@@ -127,7 +98,7 @@
       <window_info anchor="bottom" id="Version Control" order="0" />
       <window_info anchor="bottom" id="Problems" order="1" />
       <window_info anchor="bottom" id="Problems View" order="2" weight="0.32994187" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="3" visible="true" weight="0.2359496" />
+      <window_info anchor="bottom" id="Terminal" order="3" weight="0.2359496" />
       <window_info anchor="bottom" id="Services" order="4" />
       <window_info anchor="bottom" id="Run" order="5" weight="0.32994187" />
       <window_info anchor="bottom" id="Build" order="6" weight="0.32994187" />
@@ -198,7 +169,8 @@
       <workItem from="1764385907528" duration="4315000" />
       <workItem from="1765145869599" duration="3880000" />
       <workItem from="1765151692836" duration="4902000" />
-      <workItem from="1765157359316" duration="8964000" />
+      <workItem from="1765157359316" duration="9276000" />
+      <workItem from="1765197236409" duration="1144000" />
     </task>
     <servers />
   </component>
