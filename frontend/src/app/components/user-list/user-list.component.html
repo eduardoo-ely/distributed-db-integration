@@ -1,51 +1,171 @@
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Netflix Distributed Users</h2>
+    <h2>🎬 Netflix Distributed Users</h2>
 
-    <div class="btn-group">
-      <button class="btn btn-outline-primary"
-              [class.active]="selectedSource === ''"
-              (click)="onFilterChange('')">Todos</button>
-      <button class="btn btn-outline-secondary"
-              [class.active]="selectedSource === 'postgres'"
-              (click)="onFilterChange('postgres')">🐘 Postgres</button>
-      <button class="btn btn-outline-success"
-              [class.active]="selectedSource === 'mongo'"
-              (click)="onFilterChange('mongo')">🍃 Mongo</button>
-      <button class="btn btn-outline-info"
-              [class.active]="selectedSource === 'neo4j'"
-              (click)="onFilterChange('neo4j')">🕸️ Neo4j</button>
+    <div>
+      <button class="btn btn-success me-2" (click)="openCreateModal()">
+        ➕ Novo Usuário
+      </button>
+      <div class="btn-group">
+        <button class="btn btn-outline-primary"
+                [class.active]="selectedSource === ''"
+                (click)="onFilterChange('')">Todos</button>
+        <button class="btn btn-outline-secondary"
+                [class.active]="selectedSource === 'postgres'"
+                (click)="onFilterChange('postgres')">🐘 Postgres</button>
+        <button class="btn btn-outline-success"
+                [class.active]="selectedSource === 'mongo'"
+                (click)="onFilterChange('mongo')">🍃 Mongo</button>
+        <button class="btn btn-outline-info"
+                [class.active]="selectedSource === 'neo4j'"
+                (click)="onFilterChange('neo4j')">🕸️ Neo4j</button>
+      </div>
     </div>
   </div>
 
-  <div *ngIf="loading" class="text-center">
-    <div class="spinner-border" role="status"></div>
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Carregando...</span>
+    </div>
   </div>
 
+  <!-- User Cards -->
   <div class="row" *ngIf="!loading">
     <div class="col-md-4 mb-3" *ngFor="let user of users">
-      <div class="card h-100 shadow-sm">
+      <div class="card h-100 shadow-sm user-card">
         <div class="card-body">
-          <h5 class="card-title">{{ user.email }}</h5>
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h5 class="card-title mb-0">{{ user.email }}</h5>
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-outline-primary"
+                      (click)="openEditModal(user)"
+                      title="Editar">
+                ✏️
+              </button>
+              <button class="btn btn-outline-danger"
+                      (click)="deleteUser(user.userId!)"
+                      title="Excluir">
+                🗑️
+              </button>
+            </div>
+          </div>
+
           <h6 class="card-subtitle mb-2 text-muted" *ngIf="user.country">
             📍 {{ user.country }}
           </h6>
 
-          <p class="card-text">
+          <p class="card-text small">
+            <strong>ID:</strong> {{ user.userId }}<br>
+            <strong>Idade:</strong> {{ user.age || 'N/A' }}<br>
             <strong>Gêneros:</strong> {{ user.genres?.join(', ') || 'N/A' }}<br>
-            <strong>Logins:</strong> {{ user.loginCount }}
+            <strong>Logins:</strong> {{ user.loginCount || 0 }}
           </p>
 
           <hr>
 
-          <div class="d-flex gap-2">
-            <span *ngIf="isSavedIn(user, 'PostgreSQL')" class="badge bg-secondary" title="Salvo no PostgreSQL">PG</span>
-            <span *ngIf="isSavedIn(user, 'MongoDB')" class="badge bg-success" title="Salvo no MongoDB">MG</span>
-            <span *ngIf="isSavedIn(user, 'Redis')" class="badge bg-danger" title="Cache no Redis">RD</span>
-            <span *ngIf="isSavedIn(user, 'Neo4j')" class="badge bg-info text-dark" title="Nó no Neo4j">G</span>
+          <!-- Database Badges -->
+          <div class="d-flex gap-1 flex-wrap">
+            <span *ngIf="isSavedIn(user, 'PostgreSQL')"
+                  class="badge bg-secondary"
+                  title="Salvo no PostgreSQL">PG</span>
+            <span *ngIf="isSavedIn(user, 'MongoDB')"
+                  class="badge bg-success"
+                  title="Salvo no MongoDB">MG</span>
+            <span *ngIf="isSavedIn(user, 'Redis')"
+                  class="badge bg-danger"
+                  title="Cache no Redis">RD</span>
+            <span *ngIf="isSavedIn(user, 'Neo4j')"
+                  class="badge bg-info text-dark"
+                  title="Nó no Neo4j">G</span>
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && users.length === 0" class="text-center my-5">
+    <p class="text-muted">Nenhum usuário encontrado</p>
+  </div>
 </div>
+
+<!-- Modal Create/Edit -->
+<div class="modal" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ editingUser ? 'Editar Usuário' : 'Novo Usuário' }}</h5>
+        <button type="button" class="btn-close" (click)="closeModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form #userForm="ngForm">
+          <div class="mb-3">
+            <label class="form-label">User ID *</label>
+            <input type="text"
+                   class="form-control"
+                   [(ngModel)]="formData.userId"
+                   name="userId"
+                   [disabled]="!!editingUser"
+                   required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Email *</label>
+            <input type="email"
+                   class="form-control"
+                   [(ngModel)]="formData.email"
+                   name="email"
+                   required>
+          </div>
+
+          <div class="mb-3" *ngIf="!editingUser">
+            <label class="form-label">Senha *</label>
+            <input type="password"
+                   class="form-control"
+                   [(ngModel)]="formData.password"
+                   name="password"
+                   required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Idade</label>
+            <input type="number"
+                   class="form-control"
+                   [(ngModel)]="formData.age"
+                   name="age">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">País</label>
+            <input type="text"
+                   class="form-control"
+                   [(ngModel)]="formData.country"
+                   name="country">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Gêneros (separados por vírgula)</label>
+            <input type="text"
+                   class="form-control"
+                   [(ngModel)]="genresInput"
+                   name="genres"
+                   placeholder="Action, Drama, Comedy">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+        <button type="button"
+                class="btn btn-primary"
+                (click)="saveUser()"
+                [disabled]="!userForm.valid">
+          Salvar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Backdrop -->
+<div class="modal-backdrop fade" [class.show]="showModal" *ngIf="showModal"></div>

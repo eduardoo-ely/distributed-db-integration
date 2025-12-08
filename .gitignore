@@ -1,41 +1,89 @@
-# ============================
-# IntelliJ IDEA / JetBrains
-# ============================
-.idea/
-*.iml
-out/
+# ==================== BACKEND (Spring Boot) ====================
+backend/HELP.md
+backend/target/
+backend/.mvn/
+backend/mvnw
+backend/mvnw.cmd
+backend/!**/src/main/**/target/
+backend/!**/src/test/**/target/
 
-# ============================
-# Maven
-# ============================
-target/
-!.mvn/wrapper/maven-wrapper.jar
+# IDE
+backend/.idea/
+backend/*.iws
+backend/*.iml
+backend/*.ipr
+backend/.vscode/
+backend/.settings/
+backend/.classpath
+backend/.project
 
-# ============================
-# Logs
-# ============================
-*.log
-
-# ============================
-# OS files
-# ============================
+# OS
 .DS_Store
 Thumbs.db
 
-# ============================
-# Python
-# ============================
-venv/
-__pycache__/
-*.pyc
+# Logs
+backend/*.log
+backend/logs/
 
-# ============================
-# Environment files
-# ============================
-.env
-*.env
+# ==================== FRONTEND (Angular) ====================
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/.vscode/
+frontend/*.log
 
-# ============================
-# Dataset baixado localmente
-# ============================
-*.csv
+# Builds
+frontend/build/
+frontend/out/
+
+# IDE
+frontend/.idea/
+frontend/*.iws
+frontend/*.iml
+frontend/*.ipr
+
+# Environment
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+
+# ==================== DADOS SENSÍVEIS ====================
+# Arquivos JSON com dados reais (se necessário)
+# backend/src/main/resources/netflix_userbase.json
+# backend/src/main/resources/relationships.json
+
+# Configurações com senhas
+# backend/src/main/resources/application.properties
+# backend/src/main/resources/application.yml
+
+# ==================== DOCKER / DATABASES ====================
+# Volumes de dados locais (se existirem)
+postgres_data/
+mongo_data/
+neo4j_data/
+redis_data/
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# ==================== GERAL ====================
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Package files
+*.dmg
+*.pkg
+*.deb
+*.rpm
