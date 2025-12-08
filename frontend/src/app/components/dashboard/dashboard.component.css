@@ -1,0 +1,469 @@
+/* ========== VARIÁVEIS DE CORES DOS BANCOS ========== */
+:host {
+  --postgres-color: #336791;
+  --mongo-color: #47A248;
+  --redis-color: #DC382D;
+  --neo4j-color: #008CC1;
+  --bg-light: #f8f9fa;
+  --text-dark: #212529;
+  --border-color: #dee2e6;
+}
+
+/* ========== CONTAINER PRINCIPAL ========== */
+.dashboard-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding-bottom: 2rem;
+}
+
+/* ========== HEADER ========== */
+.dashboard-header {
+  background: white;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  padding: 1.5rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: var(--text-dark);
+  font-weight: 700;
+}
+
+.btn-logout {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+  background: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+/* ========== LOADING E ERROR ========== */
+.loading-container, .error-container {
+  max-width: 600px;
+  margin: 3rem auto;
+  text-align: center;
+  background: white;
+  padding: 3rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid var(--border-color);
+  border-top-color: var(--postgres-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.btn-retry {
+  background: var(--postgres-color);
+  color: white;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+/* ========== CONTENT PRINCIPAL ========== */
+.dashboard-content {
+  max-width: 1400px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+/* ========== CARDS BASE ========== */
+.card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+}
+
+.card-header {
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  font-weight: 700;
+}
+
+.card-header h2, .card-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* ========== BADGES DOS BANCOS ========== */
+.db-badge {
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.postgres-header { background: linear-gradient(135deg, var(--postgres-color) 0%, #4a7ba7 100%); }
+.mongo-header { background: linear-gradient(135deg, var(--mongo-color) 0%, #5fc86e 100%); }
+.redis-header { background: linear-gradient(135deg, var(--redis-color) 0%, #f05a50 100%); }
+.neo4j-header { background: linear-gradient(135deg, var(--neo4j-color) 0%, #00a8e1 100%); }
+.logs-header { background: linear-gradient(135deg, #6c757d 0%, #868e96 100%); }
+
+/* ========== PROFILE CARD ========== */
+.profile-card {
+  margin-bottom: 2rem;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.info-row {
+  display: flex;
+  padding: 0.8rem;
+  background: var(--bg-light);
+  border-radius: 8px;
+}
+
+.info-row .label {
+  font-weight: 700;
+  color: #6c757d;
+  min-width: 80px;
+}
+
+.info-row .value {
+  color: var(--text-dark);
+  font-weight: 500;
+}
+
+.db-indicator {
+  margin-top: 1rem;
+  padding: 0.8rem;
+  background: #e7f3ff;
+  border-left: 4px solid var(--postgres-color);
+  border-radius: 4px;
+}
+
+.db-indicator small {
+  color: var(--postgres-color);
+  font-weight: 600;
+}
+
+/* ========== GRID DE 3 COLUNAS ========== */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ========== MONGO CARD ========== */
+.data-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.8rem;
+  background: var(--bg-light);
+  border-radius: 8px;
+  border-left: 3px solid var(--mongo-color);
+}
+
+.stat-label {
+  font-weight: 600;
+  color: #6c757d;
+}
+
+.stat-value {
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.genres-container {
+  margin-top: 0.5rem;
+}
+
+.genres-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.genre-tag {
+  background: var(--mongo-color);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* ========== REDIS CARD ========== */
+.login-counter {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.counter-value {
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: var(--redis-color);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.counter-label {
+  font-size: 0.95rem;
+  color: #6c757d;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ========== NEO4J CARD ========== */
+.network-stats {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.stat-box {
+  display: inline-block;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, var(--neo4j-color), #00a8e1);
+  border-radius: 12px;
+  color: white;
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.stat-text {
+  font-size: 0.85rem;
+  margin-top: 0.3rem;
+  opacity: 0.9;
+}
+
+.connections-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.connection-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem;
+  background: var(--bg-light);
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.connection-badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.connection-type {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+/* ========== LOGS CARD ========== */
+.logs-card {
+  grid-column: 1 / -1;
+}
+
+.logs-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.log-item {
+  display: grid;
+  grid-template-columns: 200px 1fr auto;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--bg-light);
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.log-item:hover {
+  background: #e9ecef;
+  transform: translateX(4px);
+}
+
+.log-time {
+  font-size: 0.85rem;
+  color: #6c757d;
+  font-weight: 600;
+}
+
+.log-action {
+  font-weight: 500;
+  color: var(--text-dark);
+}
+
+.log-user, .log-system {
+  font-size: 0.85rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.log-user {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.log-system {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* ========== NO DATA STATE ========== */
+.no-data {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* ========== SCROLLBAR CUSTOMIZADA ========== */
+.connections-list::-webkit-scrollbar,
+.logs-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.connections-list::-webkit-scrollbar-track,
+.logs-list::-webkit-scrollbar-track {
+  background: var(--bg-light);
+  border-radius: 10px;
+}
+
+.connections-list::-webkit-scrollbar-thumb,
+.logs-list::-webkit-scrollbar-thumb {
+  background: #ced4da;
+  border-radius: 10px;
+}
+
+.connections-list::-webkit-scrollbar-thumb:hover,
+.logs-list::-webkit-scrollbar-thumb:hover {
+  background: #adb5bd;
+}
+
+/* ========== RESPONSIVIDADE ========== */
+@media (max-width: 1200px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .neo4j-card {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    padding: 1rem;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .dashboard-header h1 {
+    font-size: 1.4rem;
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .log-item {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .counter-value {
+    font-size: 2.5rem;
+  }
+
+  .card-header h2, .card-header h3 {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-content {
+    padding: 0 0.5rem;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  .info-row {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+}

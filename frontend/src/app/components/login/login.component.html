@@ -1,0 +1,70 @@
+<div class="login-wrapper">
+  <div class="login-container">
+    <div class="login-header">
+      <div class="logo">🎯</div>
+      <h1>Sistema Distribuído</h1>
+      <p>Faça login para acessar o dashboard</p>
+    </div>
+
+    <form class="login-form" (submit)="onLogin(); $event.preventDefault()">
+
+      <div class="form-group">
+        <label for="username">Email / Usuário</label>
+        <input
+          id="username"
+          type="text"
+          [(ngModel)]="username"
+          name="username"
+          placeholder="Digite seu email"
+          [disabled]="loading"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <input
+          id="password"
+          type="password"
+          [(ngModel)]="password"
+          name="password"
+          placeholder="Digite sua senha"
+          [disabled]="loading"
+          required
+        />
+      </div>
+
+      <div *ngIf="error" class="error-message">
+        ❌ {{ error }}
+      </div>
+
+      <button
+        type="submit"
+        class="btn-login"
+        [disabled]="loading"
+      >
+        <span *ngIf="!loading">Entrar</span>
+        <span *ngIf="loading" class="spinner-small"></span>
+      </button>
+
+      <button
+        type="button"
+        class="btn-test"
+        (click)="fillTestCredentials()"
+        [disabled]="loading"
+      >
+        🧪 Usar credenciais de teste
+      </button>
+
+    </form>
+
+    <div class="login-footer">
+      <div class="db-indicators">
+        <span class="db-dot postgres">PostgreSQL</span>
+        <span class="db-dot mongo">MongoDB</span>
+        <span class="db-dot redis">Redis</span>
+        <span class="db-dot neo4j">Neo4j</span>
+      </div>
+    </div>
+  </div>
+</div>

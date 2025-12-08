@@ -1,0 +1,154 @@
+<div class="dashboard-container">
+
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <h1>🎯 Dashboard Distribuído</h1>
+      <button class="btn-logout" (click)="logout()">Sair</button>
+    </div>
+  </header>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Carregando dados de múltiplos bancos...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <p>❌ {{ error }}</p>
+    <button class="btn-retry" (click)="loadDataDirectly()">Tentar Novamente</button>
+  </div>
+
+  <!-- Main Content - REMOVIDO O BLOQUEIO DO *ngIf -->
+  <div class="dashboard-content" *ngIf="!loading">
+
+    <!-- User Profile Card - PostgreSQL -->
+    <section class="card profile-card" *ngIf="user">
+      <div class="card-header postgres-header">
+        <h2>👤 Perfil do Usuário</h2>
+        <span class="db-badge postgres-badge">PostgreSQL</span>
+      </div>
+      <div class="card-body">
+        <div class="profile-info">
+          <div class="info-row">
+            <span class="label">ID:</span>
+            <span class="value">{{ user.userId }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Email:</span>
+            <span class="value">{{ user.email }}</span>
+          </div>
+          <div class="db-indicator" *ngIf="user.savedIn && user.savedIn.length > 0">
+            <small>✅ Dados armazenados em: {{ user.savedIn.join(', ') }}</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Grid de 3 colunas -->
+    <div class="cards-grid" *ngIf="user">
+
+      <!-- MongoDB Card -->
+      <section class="card mongo-card">
+        <div class="card-header mongo-header">
+          <h3>📊 Perfil Detalhado</h3>
+          <span class="db-badge mongo-badge">MongoDB</span>
+        </div>
+        <div class="card-body">
+          <div *ngIf="hasDataFrom('MongoDB')" class="data-content">
+            <div class="stat-item">
+              <span class="stat-label">Idade:</span>
+              <span class="stat-value">{{ user.age || 'N/A' }} anos</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">País:</span>
+              <span class="stat-value">{{ user.country || 'N/A' }}</span>
+            </div>
+            <div class="genres-container" *ngIf="user.genres && user.genres.length > 0">
+              <span class="stat-label">Gêneros favoritos:</span>
+              <div class="genres-list">
+                <span class="genre-tag" *ngFor="let genre of user.genres">{{ genre }}</span>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="!hasDataFrom('MongoDB')" class="no-data">
+            <p>⚠️ Dados não disponíveis no MongoDB</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Redis Card -->
+      <section class="card redis-card">
+        <div class="card-header redis-header">
+          <h3>⚡ Sessões</h3>
+          <span class="db-badge redis-badge">Redis</span>
+        </div>
+        <div class="card-body">
+          <div *ngIf="hasDataFrom('Redis')" class="data-content">
+            <div class="login-counter">
+              <div class="counter-value">{{ user.loginCount || 0 }}</div>
+              <div class="counter-label">Total de Logins</div>
+            </div>
+          </div>
+          <div *ngIf="!hasDataFrom('Redis')" class="no-data">
+            <p>⚠️ Cache não disponível</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Neo4j Card -->
+      <section class="card neo4j-card">
+        <div class="card-header neo4j-header">
+          <h3>🕸️ Rede Social</h3>
+          <span class="db-badge neo4j-badge">Neo4j</span>
+        </div>
+        <div class="card-body">
+          <div *ngIf="network && network.nodes && network.nodes.length > 0" class="data-content">
+            <div class="network-stats">
+              <div class="stat-box">
+                <div class="stat-number">{{ network.nodes.length - 1 }}</div>
+                <div class="stat-text">Conexões</div>
+              </div>
+            </div>
+            <div class="connections-list">
+              <div *ngFor="let node of network.nodes" class="connection-item">
+                <span class="connection-badge"
+                      [style.background-color]="getNodeColor(node.group)">
+                  {{ node.id }}
+                </span>
+                <span class="connection-type">{{ node.group === 'me' ? 'Você' : 'Amigo' }}</span>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="!network || !network.nodes || network.nodes.length === 0" class="no-data">
+            <p>⚠️ Sem conexões no grafo</p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Logs Section - Full Width -->
+    <section class="card logs-card">
+      <div class="card-header logs-header">
+        <h3>📜 Histórico de Atividades</h3>
+        <span class="db-badge logs-badge">Sistema</span>
+      </div>
+      <div class="card-body">
+        <div *ngIf="logs && logs.length > 0" class="logs-list">
+          <div *ngFor="let log of logs" class="log-item">
+            <span class="log-time">{{ formatTimestamp(log.timestamp) }}</span>
+            <span class="log-action">{{ log.action }}</span>
+            <span class="log-user" *ngIf="log.user">👤 {{ log.user }}</span>
+            <span class="log-system" *ngIf="log.system">⚙️ {{ log.system }}</span>
+          </div>
+        </div>
+        <div *ngIf="!logs || logs.length === 0" class="no-data">
+          <p>📭 Nenhuma atividade registrada</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
