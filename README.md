@@ -1,163 +1,131 @@
-# 🎓 Projeto Acadêmico - Backend Multi-Banco
+# 🎓 Sistema Distribuído Fullstack - Integração Multi-Banco
 
-> **Estrutura backend conectando 4 bancos de dados diferentes, cada um com propósito específico**
-
----
-
-## 🎯 Propósito de Cada Banco
-
-| Banco | Uso                                   | Status |
-|-------|---------------------------------------|--------|
-| **MongoDB** | Dados de pessoas                      | ✅ Conectado |
-| **PostgreSQL** | Dados estruturados                    | ✅ Conectado |
-| **Redis** | Cache                                 | ✅ Conectado |
-| **Neo4j** | Relacionamentos e grafos (permissões) | ✅ Conectado |
+> **Plataforma demonstrativa de persistência poliglota, sincronizando transações entre 4 paradigmas de banco de dados simultaneamente.**
 
 ---
 
-## 📁 Estrutura do Projeto
+## 🏗️ Arquitetura do Projeto
 
-```
-bancos-java/
-├── src/main/java/com/academia/bancos/
-│   ├── Main.java                      # Testa conexões apenas
-│   ├── config/                        # Configurações de cada banco
-│   │   ├── PostgresConfig.java
-│   │   ├── MongoConfig.java
-│   │   ├── RedisConfig.java
-│   │   └── Neo4jConfig.java
-│   ├── service/                       # Serviços (Futuro)
-│   │   ├── MongoService.java         # (Futuro)
-│   │   ├── PostgresService.java      # (Futuro)
-│   │   ├── RedisService.java         # (Futuro)
-│   │   └── Neo4jService.java         # (Futuro)
-│   └── model/                         # Modelos básicos
-│       ├── Pessoa.java                # MongoDB (futuro)
-│       └── Credencial.java            # PostgreSQL (futuro)
-└── resources/
-    └── application.properties
-```
+O sistema simula uma rede social (estilo Netflix/Facebook) onde cada aspecto do dado é salvo no banco mais adequado para sua função, mantendo a consistência via código (Backend).
+
+| Camada | Tecnologia | Função |
+|--------|------------|--------|
+| **Frontend** | Angular 17+ | Dashboard, Gráficos e Gestão de Usuários |
+| **Backend** | Java 17 (Spring Boot) | Orquestração, API REST e Regras de Negócio |
+| **Infra** | Docker Compose | Containerização dos 4 Bancos |
 
 ---
 
-## ⚙️ Configuração dos Bancos
+## 🎯 Propósito de Cada Banco (Implementado)
 
-### **Portas e Credenciais**
-
-| Banco | Porta | Usuário | Senha |
-|-------|-------|---------|-------|
-| PostgreSQL | 5433 | admin | admin123 |
-| MongoDB | 27017 | admin | admin123 |
-| Redis | 6380 | - | admin123 |
-| Neo4j | 7687 | neo4j | senha123 |
+| Banco | Tipo | Uso no Projeto | Status |
+|-------|------|----------------|--------|
+| **PostgreSQL** | Relacional | **Autenticação:** Email, Hash de Senha e IDs | ✅ CRUD Real |
+| **MongoDB** | Documental | **Perfil Rico:** Idade, País, Lista de Gêneros/Filmes | ✅ CRUD Real |
+| **Neo4j** | Grafo | **Rede Social:** Nós (Usuários) e Arestas (Seguidores) | ✅ Visualização |
+| **Redis** | Chave-Valor | **Sessão & Logs:** Contagem de logins e Cache | ✅ Tempo Real |
 
 ---
 
-## 🚀 Como Executar
+## 🚀 Funcionalidades Principais
 
-### **1. Subir os containers Docker**
+### 1. 🔐 Autenticação & Sessão
+- Login valida credenciais no **Postgres**.
+- Ao logar, incrementa contador e salva timestamp de "último acesso" no **Redis**.
 
-```bash
-cd ~/projetos/bancos-java
-docker-compose up -d
-```
+### 2. 👥 CRUD Distribuído (Atomicidade Lógica)
+- **Criar Usuário:** Salva credenciais (PG), cria perfil (Mongo), cria nó (Neo4j) e inicia cache (Redis).
+- **Editar:** Permite alterar senha (vai p/ PG), país/filmes (vai p/ Mongo) simultaneamente.
+- **Deletar:** Remove o registro de **todos** os 4 bancos para garantir integridade.
 
-### **2. Verificar se estão rodando**
+### 3. 🕸️ Grafo Social Interativo
+- Visualização de bolinhas (Nós) conectadas.
+- Botão **"Conectar/Desconectar"** cria ou remove relações `FOLLOWS` no **Neo4j**.
 
-```bash
-docker-compose ps
-```
-
-### **3. Executar o projeto**
-
-```bash
-mvn exec:java -Dexec.mainClass="com.academia.bancos.Main"
-```
-
-**OU** no IntelliJ:
-- Abra `Main.java`
-- Clique no ▶️ verde
-- Selecione **Run 'Main.main()'**
+### 4. 📜 Logs e Auditoria
+- Histórico de atividades recentes puxadas do sistema e do **Redis**.
 
 ---
 
-## ✅ O Que Este Projeto Faz
+## ⚙️ Como Executar
 
-- ✅ **Testa conexão** com todos os 4 bancos
-- ✅ **Configura** cada banco corretamente
-- ✅ **Estrutura básica** de serviços (métodos vazios)
-- ✅ **Modelos básicos** (sem uso ainda)
-
-## ❌ O Que Este Projeto NÃO Faz
-
-- ❌ **Não insere** dados automaticamente
-- ❌ **Não popula** tabelas/coleções
-- ❌ **Não executa** operações CRUD automaticamente
-- ❌ **Não cria** registros fictícios
-
----
-
-
-
-## 🧪 Testar Manualmente os Bancos
-
-### **PostgreSQL**
-```bash
-docker exec -it postgres-db psql -U admin -d crud_db
-```
-
-### **MongoDB**
-```bash
-docker exec -it mongodb mongosh -u admin -p admin123 --authenticationDatabase admin
-```
-
-### **Redis**
-```bash
-docker exec -it redis-db redis-cli -a admin123
-```
-
-### **Neo4j**
-Acesse: http://localhost:7474
-
----
-
-## 📝 Status Atual
-
-- ✅ Docker Compose configurado
-- ✅ Todos os bancos conectados e funcionando
-- ✅ Classes de configuração implementadas
-- ✅ Estrutura de serviços criada (vazios)
-- ✅ Modelos básicos definidos
-- ⏳ **Aguardando definição da modelagem de dados**
-- ⏳ **Aguardando alimentação manual dos dados**
-- ⏳ **Aguardando implementação da lógica de negócio**
-
----
-
-## 👨‍💻 Desenvolvimento
-
-**Tecnologias:**
-- Java 17
-- Maven
+### Pré-requisitos
 - Docker & Docker Compose
-- IntelliJ IDEA
-- WSL2
+- Java 17+ (JDK)
+- Node.js & NPM (para o Angular)
 
-**Bancos de Dados:**
-- PostgreSQL 15
-- MongoDB 6.0
-- Redis 7
-- Neo4j Latest
+### Passo 1: Subir os Bancos
+```bash
+docker-compose up -d
+````
 
----
+### Passo 2: Rodar o Backend (Spring Boot)
 
-## 📚 Documentação
+```bash
+cd backend
+mvn spring-boot:run
+```
 
-- [Documentação PostgreSQL](https://www.postgresql.org/docs/)
-- [Documentação MongoDB](https://docs.mongodb.com/)
-- [Documentação Redis](https://redis.io/documentation)
-- [Documentação Neo4j](https://neo4j.com/docs/)
+*Aguarde a mensagem: "SEED FINALIZADO COM SUCESSO"*
 
----
+### Passo 3: Rodar o Frontend (Angular)
 
-**Última atualização:** Novembro 2025
+```bash
+cd frontend
+npm install
+npm start
+```
+
+*Acesse: http://localhost:4200*
+
+-----
+
+## 🔑 Acesso Administrativo (Seed Automático)
+
+O sistema carrega automaticamente um usuário administrador ao iniciar:
+
+- **Email:** `admin@admin.com`
+- **Senha:** `123456`
+
+-----
+
+## 📁 Estrutura de Pastas
+
+```
+distributed-db-integration/
+├── backend/
+│   ├── src/main/java/com/academia/bancos/
+│   │   ├── controller/       # Endpoints (User, Auth, Network, Logs)
+│   │   ├── service/          # Lógica de distribuição (UserService)
+│   │   ├── repository/       # Conexões específicas (PG, Mongo, Neo4j)
+│   │   ├── model/            # Entidades (JPA, Document, Node)
+│   │   └── seed/             # Carga inicial de dados (DataSeeder)
+│   └── src/main/resources/   # Configurações e Arquivos JSON
+│
+├── frontend/
+│   ├── src/app/components/   # Telas (Login, Dashboard)
+│   └── src/app/services/     # Comunicação com API
+│
+└── docker-compose.yml        # Orquestração dos Containers
+```
+
+-----
+
+## 🧪 Portas e Acessos Diretos
+
+Caso queira inspecionar os bancos manualmente:
+
+| Serviço | Porta Local | Usuário | Senha | Comando Rápido |
+|---------|-------------|---------|-------|----------------|
+| **Frontend** | 4200 | - | - | Browser |
+| **Backend** | 8080 | - | - | Postman/Browser |
+| **Postgres** | 5433 | admin | admin123 | `psql -h localhost -p 5433 -U admin -d crud_db` |
+| **MongoDB** | 27017 | admin | admin123 | `mongosh "mongodb://admin:admin123@localhost:27017/crud_db?authSource=admin"` |
+| **Neo4j** | 7474 | neo4j | senha123 | Browser: `http://localhost:7474` |
+| **Redis** | 6380 | - | admin123 | `redis-cli -p 6380 -a admin123` |
+
+-----
+
+## 👨‍💻 Autor
+
+Desenvolvido como projeto acadêmico para demonstrar integração de sistemas distribuídos e persistência poliglota.
