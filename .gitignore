@@ -1,28 +1,31 @@
-# ==================== GERAL ====================
-*.log
-*.tmp
-*.bak
-*.swp
-*~
-.DS_Store
-Thumbs.db
-
-# ==================== IDE / EDITORES ====================
-
-# IntelliJ IDEA
+# ==================================
+# INTELLIJ IDEA (JetBrains)
+# ==================================
 .idea/
-*.iml
 *.iws
+*.iml
 *.ipr
 out/
-.idea_modules/
+.settings/
+.classpath
+.project
 
-# ==================== JAVA / SPRING BOOT ====================
+# ==================================
+# GERAL / SISTEMA OPERACIONAL
+# ==================================
+.DS_Store
+Thumbs.db
+*.log
+tmp/
+temp/
+venv/
 
-# Compiled class files
+# ==================================
+# BACKEND (JAVA / MAVEN / SPRING)
+# ==================================
+target/
+backend/target/
 *.class
-
-# Package Files
 *.jar
 *.war
 *.nar
@@ -31,181 +34,38 @@ out/
 *.tar.gz
 *.rar
 
-# Maven
-target/
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
+# Logs específicos do Spring Boot
+hs_err_pid*
+backend/logs/
 
-# Gradle
-.gradle/
-build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-# Spring Boot
-spring-boot-*.log
-application-*.properties
-application-*.yml
-!application.properties
-!application.yml
-
-# ==================== ANGULAR / NODE ====================
-
-# Node modules
+# ==================================
+# FRONTEND (ANGULAR / NODE)
+# ==================================
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
-.pnpm-debug.log*
-
-# Angular
-/frontend/dist/
-/frontend/tmp/
-/frontend/out-tsc/
-/frontend/.angular/
-/frontend/.sass-cache/
-/frontend/connect.lock/
-/frontend/coverage/
-/frontend/libpeerconnection.log
-/frontend/testem.log
-/frontend/typings
-
-# Angular cache
-.angular/
-
-# System Files
-.DS_Store
-Thumbs.db
-
-# ==================== DATABASES ====================
-
-# PostgreSQL
-*.sql.backup
-*.dump
-
-# MongoDB
-*.bson
-
-# Redis
-dump.rdb
-appendonly.aof
-
-# Neo4j
-*.db
-neo4j/data/
-neo4j/logs/
-
-# H2 Database
-*.h2.db
-*.trace.db
-
-# ==================== DOCKER ====================
-docker-compose.override.yml
-.dockerignore
-
-# ==================== SEGURANÇA ====================
-
-# Arquivos de configuração sensíveis
-*.env
-*.env.local
-*.env.development.local
-*.env.test.local
-*.env.production.local
-.env.*.local
-
-# Chaves e certificados
-*.pem
-*.key
-*.crt
-*.p12
-*.jks
-*.keystore
-
-# Credenciais
-credentials.json
-secrets.yml
-secrets.properties
-
-# ==================== BUILD / DIST ====================
-
-# Build outputs
+frontend/node_modules/
 dist/
-build/
-out/
-target/
-.build/
-
-# ==================== TESTES ====================
-
-# Coverage reports
+frontend/dist/
+.angular/
+frontend/.angular/
+.sass-cache/
+connect.lock
 coverage/
-*.lcov
-.nyc_output/
-test-results/
-junit.xml
+lib/
+test-report.xml
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
 
-# ==================== LOGS ====================
+# ==================================
+# DOCKER & DADOS LOCAIS
+# ==================================
+data/
+db-data/
+postgres-data/
+mongo-data/
+neo4j-data/
+redis-data/
+neo4j/
 
-# Application logs
-logs/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
-
-# ==================== TEMP / CACHE ====================
-
-# Temporary files
-tmp/
-temp/
-*.tmp
-*.cache
-.cache/
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-desktop.ini
-
-# ==================== DOCUMENTAÇÃO ====================
-
-# Documentação gerada
-docs/generated/
-javadoc/
-typedoc/
-
-# ==================== OUTROS ====================
-
-# Backup files
-*.backup
-*~
-
-# Lock files (opcional - descomente se quiser versionar)
-package-lock.json
-yarn.lock
-pom.xml.lock
-
-# ==================== PROJETO ESPECÍFICO ====================
-
-# Dados de seed/teste grandes
-/backend/src/main/resources/netflix_userbase.json.backup
-/backend/src/main/resources/relationships.json.backup
-
-# Arquivos de configuração local
-application-local.properties
-application-dev.properties
+# Arquivos de variáveis de ambiente
+.env

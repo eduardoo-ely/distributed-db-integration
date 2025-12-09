@@ -2,10 +2,13 @@ package com.academia.bancos.controller;
 
 import com.academia.bancos.model.entity.UserEntity;
 import com.academia.bancos.repository.UserRepositoryPG;
+import com.academia.bancos.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -15,66 +18,55 @@ import java.util.Optional;
 @CrossOrigin(origins = "http://localhost:4200")
 public class AuthController {
 
-    @Autowired
-    private UserRepositoryPG userRepository;
+    @Autowired private UserRepositoryPG userRepository;
+    @Autowired private UserService userService;
+    @Autowired private StringRedisTemplate redisTemplate; // <--- Importante para salvar sessão
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        // TRUQUE: Se o email vier nulo, tenta pegar do campo 'username'
-        String emailParaUsar = request.email;
-        if (emailParaUsar == null) {
-            emailParaUsar = request.username;
-        }
-
-        // Debug
-        System.out.println("---------------------------------------------");
-        System.out.println("📥 JSON PROCESSADO:");
-        System.out.println("   Email Final: " + emailParaUsar);
-        System.out.println("   Senha: " + request.password);
-        System.out.println("---------------------------------------------");
+        String emailParaUsar = request.email != null ? request.email : request.username;
 
         if (emailParaUsar == null || request.password == null) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Email/Username e senha são obrigatórios!"));
+            return ResponseEntity.badRequest().body(Map.of("message", "Dados incompletos"));
         }
 
-        // 1. Busca no Postgres
         Optional<UserEntity> userOpt = userRepository.findByEmail(emailParaUsar);
 
         if (userOpt.isPresent()) {
             UserEntity user = userOpt.get();
-
-            // 2. Verifica senha
             if (user.getPasswordHash().equals(request.password)) {
+
+                String userId = user.getUserId();
+
+                // === 1. REDIS: Incrementar Contador ===
+                userService.incrementLoginCount(userId);
+
+                // === 2. REDIS: Salvar Status da Sessão ===
+                redisTemplate.opsForValue().set("session:" + userId, "ACTIVE");
+
+                // === 3. REDIS: Salvar Data do Login (Para os Logs) ===
+                redisTemplate.opsForValue().set("last_login:" + userId, LocalDateTime.now().toString());
+
                 Map<String, Object> response = new HashMap<>();
-                response.put("token", "token-falso-para-teste-123");
-                response.put("userId", user.getUserId());
+                response.put("token", "fake-jwt-" + userId);
+                response.put("userId", userId);
                 response.put("email", user.getEmail());
 
-                System.out.println("✅ Login SUCESSO para: " + user.getUserId());
                 return ResponseEntity.ok(response);
             }
         }
-
-        System.out.println("❌ Login FALHOU (senha ou email incorretos)");
-        return ResponseEntity.status(401).body(Map.of("message", "Email ou senha inválidos"));
+        return ResponseEntity.status(401).body(Map.of("message", "Credenciais inválidas"));
     }
 
-   public static class LoginRequest {
+    public static class LoginRequest {
         public String email;
         public String username;
-        public String user;
         public String password;
-
-        // Getters e Setters (importante para o Jackson funcionar bem)
+        // Getters e Setters
         public String getEmail() { return email; }
         public void setEmail(String email) { this.email = email; }
-
         public String getUsername() { return username; }
         public void setUsername(String username) { this.username = username; }
-
-       public String getUser() { return user; }
-       public void setUser(String user) { this.user = user; }
-
         public String getPassword() { return password; }
         public void setPassword(String password) { this.password = password; }
     }

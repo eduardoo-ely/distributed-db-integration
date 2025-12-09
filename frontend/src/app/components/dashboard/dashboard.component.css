@@ -4,6 +4,7 @@
   --mongo-color: #47A248;
   --redis-color: #DC382D;
   --neo4j-color: #008CC1;
+  --crud-header-bg: linear-gradient(135deg, #607d8b 0%, #455a64 100%);
   --bg-light: #f8f9fa;
   --text-dark: #212529;
   --border-color: #dee2e6;
@@ -14,6 +15,7 @@
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding-bottom: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* ========== HEADER ========== */
@@ -145,10 +147,12 @@
   background: rgba(255, 255, 255, 0.25);
 }
 
+/* Header Gradients */
 .postgres-header { background: linear-gradient(135deg, var(--postgres-color) 0%, #4a7ba7 100%); }
 .mongo-header { background: linear-gradient(135deg, var(--mongo-color) 0%, #5fc86e 100%); }
 .redis-header { background: linear-gradient(135deg, var(--redis-color) 0%, #f05a50 100%); }
 .neo4j-header { background: linear-gradient(135deg, var(--neo4j-color) 0%, #00a8e1 100%); }
+.crud-header { background: var(--crud-header-bg); }
 .logs-header { background: linear-gradient(135deg, #6c757d 0%, #868e96 100%); }
 
 /* ========== PROFILE CARD ========== */
@@ -323,9 +327,124 @@
   color: #6c757d;
 }
 
+/* ========== CRUD SECTION (Novo) ========== */
+.create-form-container {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  border: 1px solid var(--border-color);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box; /* Garante que o padding não estoure a largura */
+}
+
+.form-control:focus {
+  border-color: #607d8b;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(96, 125, 139, 0.15);
+}
+
+/* Botão Salvar (Verde) */
+.btn-save {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+  width: 100%;
+  transition: background 0.2s;
+}
+.btn-save:hover { background: #218838; }
+
+/* Botão Atualizar (Cinza Azulado) */
+.btn-refresh {
+  background: #455a64;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+.btn-refresh:hover { background: #37474f; }
+
+/* Tabela CRUD */
+.table-container {
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+
+.crud-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.crud-table th {
+  background: #343a40;
+  color: white;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 3px solid #212529;
+}
+
+.crud-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+  color: var(--text-dark);
+}
+
+.crud-table tr:last-child td {
+  border-bottom: none;
+}
+
+.crud-table tr:hover {
+  background-color: #f1f3f5;
+}
+
+/* Botão Deletar (Vermelho) */
+.btn-delete {
+  background: #ff5252;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-delete:hover { background: #ff1744; }
+
+
 /* ========== LOGS CARD ========== */
 .logs-card {
   grid-column: 1 / -1;
+  margin-top: 1.5rem;
 }
 
 .logs-list {
@@ -388,24 +507,29 @@
 
 /* ========== SCROLLBAR CUSTOMIZADA ========== */
 .connections-list::-webkit-scrollbar,
-.logs-list::-webkit-scrollbar {
+.logs-list::-webkit-scrollbar,
+.table-container::-webkit-scrollbar {
   width: 6px;
+  height: 6px; /* Altura para scroll horizontal da tabela */
 }
 
 .connections-list::-webkit-scrollbar-track,
-.logs-list::-webkit-scrollbar-track {
+.logs-list::-webkit-scrollbar-track,
+.table-container::-webkit-scrollbar-track {
   background: var(--bg-light);
   border-radius: 10px;
 }
 
 .connections-list::-webkit-scrollbar-thumb,
-.logs-list::-webkit-scrollbar-thumb {
+.logs-list::-webkit-scrollbar-thumb,
+.table-container::-webkit-scrollbar-thumb {
   background: #ced4da;
   border-radius: 10px;
 }
 
 .connections-list::-webkit-scrollbar-thumb:hover,
-.logs-list::-webkit-scrollbar-thumb:hover {
+.logs-list::-webkit-scrollbar-thumb:hover,
+.table-container::-webkit-scrollbar-thumb:hover {
   background: #adb5bd;
 }
 
@@ -451,6 +575,10 @@
   .card-header h2, .card-header h3 {
     font-size: 1.1rem;
   }
+
+  .form-grid {
+    grid-template-columns: 1fr; /* Um campo por linha no mobile */
+  }
 }
 
 @media (max-width: 480px) {
@@ -466,4 +594,139 @@
     flex-direction: column;
     gap: 0.3rem;
   }
+}
+
+/* ========================================= */
+/* ESTILO DO MODAL FLUTUANTE           */
+/* ========================================= */
+
+/* O Fundo Escuro (Overlay) */
+.modal-overlay {
+  position: fixed; /* Fixa na tela inteira */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6); /* Preto 60% transparente */
+  display: flex;
+  justify-content: center; /* Centraliza Horizontalmente */
+  align-items: center;     /* Centraliza Verticalmente */
+  z-index: 9999;           /* Garante que fique por cima de tudo */
+  backdrop-filter: blur(4px); /* Efeito de desfoque no fundo (moderno) */
+  animation: fadeIn 0.3s ease;
+}
+
+/* A Janela Branca (Conteúdo) */
+.modal-content {
+  background: white;
+  width: 90%;
+  max-width: 500px; /* Largura máxima bonita */
+  border-radius: 12px;
+  padding: 0; /* Padding controlado nos filhos */
+  box-shadow: 0 15px 35px rgba(0,0,0,0.25); /* Sombra profunda para "flutuar" */
+  transform: translateY(0);
+  animation: slideUp 0.3s ease-out;
+  overflow: hidden; /* Para o header não sair das bordas arredondadas */
+}
+
+/* Cabeçalho do Modal */
+.modal-header {
+  background: var(--bg-light);
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--text-dark);
+}
+
+.btn-close {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #999;
+  transition: color 0.2s;
+}
+
+.btn-close:hover {
+  color: #333;
+}
+
+/* Corpo do Modal */
+.modal-body {
+  padding: 20px;
+  max-height: 70vh; /* Se a tela for pequena, cria scroll interno */
+  overflow-y: auto;
+}
+
+/* Rodapé do Modal */
+.modal-footer {
+  padding: 15px 20px;
+  background: var(--bg-light);
+  border-top: 1px solid var(--border-color);
+  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Inputs dentro do Modal */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.form-row {
+  display: flex;
+  gap: 15px;
+}
+
+/* Botões do Modal */
+.btn-cancel {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-save-modal {
+  background: #0d6efd; /* Azul destaque */
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-save-modal:hover {
+  background: #0b5ed7;
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }

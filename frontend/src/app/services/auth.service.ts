@@ -4,22 +4,42 @@ import { Observable, tap } from 'rxjs';
 import { AuthResponse } from '../models/data.model';
 
 @Injectable({ providedIn: 'root' })
+
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/api/auth'; // Ajuste sua URL
+  private tokenKey = 'auth_token';
+  private userIdKey = 'auth_user_id';
 
-  constructor(private http: HttpClient) {}
+  constructor() { }
 
-  login(credentials: {username: string, password: string}): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
-      tap(res => localStorage.setItem('token', res.token))
-    );
+  login(token: string, userId: string): void {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(this.tokenKey, token);
+      localStorage.setItem(this.userIdKey, userId);
+    }
   }
 
-  logout() {
-    localStorage.removeItem('token');
+  logout(): void {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem(this.tokenKey);
+      localStorage.removeItem(this.userIdKey); // <--- Limpa ID
+    }
   }
 
-  getToken() {
-    return localStorage.getItem('token');
+  getToken(): string | null {
+    if (typeof localStorage !== 'undefined') {
+      return localStorage.getItem(this.tokenKey);
+    }
+    return null;
+  }
+
+  getUserId(): string | null {
+    if (typeof localStorage !== 'undefined') {
+      return localStorage.getItem(this.userIdKey);
+    }
+    return null;
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.getToken();
   }
 }

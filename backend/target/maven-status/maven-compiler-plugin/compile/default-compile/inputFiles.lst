@@ -1,0 +1,15 @@
+/home/eduardo/projetos/bancos-java/backend/src/main/java/com/academia/bancos/model/document/UserProfileDoc.java
+/home/eduardo/projetos/bancos-java/backend/src/main/java/com/academia/bancos/model/entity/UserEntity.java
+/home/eduardo/projetos/bancos-java/backend/src/main/java/com/academia/bancos/controller/AuthController.java
+/home/eduardo/projetos/bancos-java/backend/src/main/java/com/academia/bancos/service/UserService.java
+/home/eduardo/projetos/bancos-java/backend/src/main/java/com/academia/bancos/repository/UserRepositoryMongo.java
+/home/eduardo/projetos/bancos-java/backend/src/main/java/com/academia/bancos/BancosApplication.java
+/home/eduardo/projetos/bancos-java/backend/src/main/java/com/academia/bancos/seed/DataSeeder.java
+/home/eduardo/projetos/bancos-java/backend/src/main/java/com/academia/bancos/config/CorsConfig.java
+/home/eduardo/projetos/bancos-java/backend/src/main/java/com/academia/bancos/model/node/UserNode.java
+/home/eduardo/projetos/bancos-java/backend/src/main/java/com/academia/bancos/repository/UserRepositoryPG.java
+/home/eduardo/projetos/bancos-java/backend/src/main/java/com/academia/bancos/repository/UserRepositoryNeo4j.java
+/home/eduardo/projetos/bancos-java/backend/src/main/java/com/academia/bancos/controller/UserController.java
+/home/eduardo/projetos/bancos-java/backend/src/main/java/com/academia/bancos/controller/NetworkController.java
+/home/eduardo/projetos/bancos-java/backend/src/main/java/com/academia/bancos/controller/LogController.java
+/home/eduardo/projetos/bancos-java/backend/src/main/java/com/academia/bancos/model/dto/UserDTO.java
